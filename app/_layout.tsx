@@ -1,37 +1,25 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import { Stack } from "expo-router";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
-
-  if (!loaded) {
-    return null;
-  }
-
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <Stack>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="A-login" />
+      <Stack.Screen name="B-forgotPass" />
+      <Stack.Screen name="B-forgotPass2" />
+      <Stack.Screen name="C-profile" />
+      <Stack.Screen name="D-menuEmployee" />
+      <Stack.Screen name="E-surveyConstEmploy" />
+      <Stack.Screen name="F-surveyQuesEmploy" />
+      <Stack.Screen name="G-adminMenu" />
+      <Stack.Screen name="H-adminSeeSurvey" />
+      <Stack.Screen name="I-adminPublishedSurvey" />
+      <Stack.Screen name="J-adminPublishedResult" />
+      <Stack.Screen name="K-adminPublishedResultDetail" />
+      <Stack.Screen name="L-adminSurveyOverview" />
+      <Stack.Screen name="R-employeeList" />
+      <Stack.Screen name="s-kpi" />
+      <Stack.Screen name="t-employeeRecord" />
+    </Stack>
   );
 }
