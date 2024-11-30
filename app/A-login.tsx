@@ -1,6 +1,7 @@
 import React, {useState, useLayoutEffect} from 'react';
 import {Text, View, StyleSheet, Button, Alert, TextInput, Dimensions,} from 'react-native';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 20;

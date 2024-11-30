@@ -7,7 +7,8 @@ import {
     Dimensions,
     Button,
 } from 'react-native';
-import { useNavigation, CommonActions } from '@react-navigation/native';
+import { CommonActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 
 
 //Universal Constants

@@ -92,6 +92,10 @@ const app = () => {
       title="test file"
       onPress={() => router.push('/ZZZZ_testFile')}  
     />
+    <Button
+      title="test file"
+      onPress={() => router.push('/testfile')}  
+    />
   </View>
   );
 }

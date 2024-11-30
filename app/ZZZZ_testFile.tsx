@@ -1,75 +1,93 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 
-export default function App() {
-  // Step 1: State for managing the current screen view
-  const [currentScreen, setCurrentScreen] = useState('Home'); // 'Home' or 'SurveyEditor'
+const SurveyEditor = ({ onSave, onCancel }) => {
   const [surveyTitle, setSurveyTitle] = useState('');
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
 
-  // Step 2: Function to handle creating a new survey
-  const handleCreateSurvey = () => {
-    if (surveyTitle) {
-      setCurrentScreen('SurveyEditor'); // Navigate to the Survey Editor screen
-    } else {
-      alert('Please enter a survey title!');
-    }
-  };
-
-  // Step 3: Function to handle adding questions to the survey
+  // Function to handle adding questions
   const handleAddQuestion = () => {
     if (newQuestion) {
       setQuestions([...questions, newQuestion]);
-      setNewQuestion(''); // Clear input field after adding question
+      setNewQuestion('');
     } else {
       alert('Please enter a question!');
     }
   };
 
-  // Step 4: Conditional rendering based on the current screen
-  if (currentScreen === 'Home') {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Create a New Survey</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Survey Title"
-          value={surveyTitle}
-          onChangeText={setSurveyTitle}
+  return (
+    <View style={styles.container}>
+      {/* Survey Title Input */}
+      <Text style={styles.title}>Create/Edit Survey</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Enter Survey Title"
+        value={surveyTitle}
+        onChangeText={setSurveyTitle}
+      />
+
+      {/* Existing Questions */}
+      <ScrollView style={styles.questionList}>
+        {questions.map((question, index) => (
+          <Text key={index} style={styles.question}>
+            {index + 1}. {question}
+          </Text>
+        ))}
+      </ScrollView>
+
+      {/* Add New Question */}
+      <TextInput
+        style={styles.input}
+        placeholder="Enter a new question"
+        value={newQuestion}
+        onChangeText={setNewQuestion}
+      />
+      <Button title="Add Question" onPress={handleAddQuestion} />
+
+      {/* Save and Cancel Buttons */}
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Save Survey"
+          onPress={() => {
+            if (!surveyTitle) {
+              alert('Please provide a survey title!');
+              return;
+            }
+            onSave({ surveyTitle, questions });
+          }}
         />
-        <Button title="Create Survey" onPress={handleCreateSurvey} />
+        <Button title="Cancel" color="red" onPress={onCancel} />
       </View>
-    );
-  }
+    </View>
+  );
+};
 
-  if (currentScreen === 'SurveyEditor') {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>Editing Survey: {surveyTitle}</Text>
-        
-        {/* Display existing questions */}
-        <ScrollView>
-          {questions.map((question, index) => (
-            <Text key={index} style={styles.question}>{index + 1}. {question}</Text>
-          ))}
-        </ScrollView>
+// Main App Component to demonstrate usage
+export default function App() {
+  const [isEditorVisible, setIsEditorVisible] = useState(false);
 
-        {/* Add new question */}
-        <TextInput
-          style={styles.input}
-          placeholder="Enter a new question"
-          value={newQuestion}
-          onChangeText={setNewQuestion}
+  // Function to handle saving the survey
+  const handleSaveSurvey = (surveyData) => {
+    alert(`Survey Saved!\nTitle: ${surveyData.surveyTitle}\nQuestions: ${surveyData.questions.join(', ')}`);
+    setIsEditorVisible(false);
+  };
+
+  return (
+    <View style={styles.container}>
+      {isEditorVisible ? (
+        <SurveyEditor
+          onSave={handleSaveSurvey}
+          onCancel={() => setIsEditorVisible(false)}
         />
-        <Button title="Add Question" onPress={handleAddQuestion} />
-
-        <Button title="Save Survey" onPress={() => alert('Survey Saved!')} />
-      </View>
-    );
-  }
-
-  return null; // Fallback case
+      ) : (
+        <View>
+          <Text style={styles.title}>Welcome to the Survey App</Text>
+          <Button title="Create New Survey" onPress={() => setIsEditorVisible(true)} />
+        </View>
+      )}
+    </View>
+  );
 }
 
 // Styles for the components
@@ -94,5 +112,14 @@ const styles = StyleSheet.create({
   question: {
     fontSize: 18,
     marginVertical: 5,
+  },
+  questionList: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '80%',
   },
 });
