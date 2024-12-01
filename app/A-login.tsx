@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Text, View, StyleSheet, Button, Alert, TextInput, Dimensions} from 'react-native';
 import {CommonActions} from '@react-navigation/native';
 import {useNavigation} from 'expo-router';
+import axios from 'axios'; 
 
 const {width, height} = Dimensions.get('window');
 
@@ -27,38 +28,29 @@ const app = () => {
     }
   };
 
-  //Log in 
-  const testData = [
-    { email: 'admin@example.com', password: 'admin123', role: 'Admin' },
-    { email: 'employee@example.com', password: 'employee123', role: 'User' },
-  ];
-
-
-  const login = () => {
+  const login = async () => {
     if (!buttonSelected) {
       setLoginErrorState(true);
       Alert.alert('Please select either Admin or Employee to proceed.');
       return; 
     }
 
-    //This shuold be replaced with the database of logging in
-    const validLogin = testData.find(
-      (user) => user.email === email && user.password === password && user.role === buttonSelected
-    );
-  
-    if (!validLogin) {
-      setLoginErrorState(true);
-    }
-    else {
-      setLoginErrorState(false);
-      //enter what to do if login is successful
-      //check admin/menu
+    try {
+      // Send login data to backend API
+      const response = await axios.post('http://localhost:5001/login', {
+        user_email: email,
+        user_password: password,
+        user_role: buttonSelected
+      });
 
+      // If login is successful
+      setLoginErrorState(false);
+      
+      // Navigate based on role
       let route;
-      if (buttonSelected == 'Admin') {
+      if (buttonSelected === 'Admin') {
         route = 'G-adminMenu';
-      }
-      else {
+      } else {
         route = 'D-menuEmployee';
       }
 
@@ -68,6 +60,14 @@ const app = () => {
           routes: [{ name: route }],
         })
       );
+    } 
+    
+    catch (error) {
+      // Handle login failure
+      setLoginErrorState(true);
+      console.error('Login failed', error);
+      Alert.alert('Invalid email, password, or role');
+
     }
   }
 

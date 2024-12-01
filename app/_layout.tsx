@@ -10,16 +10,16 @@ export default function RootLayout() {
       <Stack.Screen name="C-profile" options={{title: 'Profile'}}/>
       <Stack.Screen name="D-menuEmployee" options={{title: 'Main Menu'}}/>
       <Stack.Screen name="E-surveyConstEmploy" options={{title: 'Survey'}}/>
-      <Stack.Screen name="F-surveyQuesEmploy" />
-      <Stack.Screen name="G-adminMenu" />
-      <Stack.Screen name="H-adminSeeSurvey" />
-      <Stack.Screen name="I-adminPublishedSurvey" />
-      <Stack.Screen name="J-adminPublishedResult" />
-      <Stack.Screen name="K-adminPublishedResultDetail" />
-      <Stack.Screen name="L-adminSurveyOverview" />
-      <Stack.Screen name="R-employeeList" />
-      <Stack.Screen name="s-kpi" />
-      <Stack.Screen name="t-employeeRecord" />
+      <Stack.Screen name="F-surveyQuesEmploy" options={{title: 'Survey'}}/>
+      <Stack.Screen name="G-adminMenu" options={{title: 'Main Menu'}}/>
+      <Stack.Screen name="H-adminSeeSurvey" options={{title: 'See Survey'}} />
+      <Stack.Screen name="I-adminPublishedSurvey" options={{title: 'Published Survey'}}/>
+      <Stack.Screen name="J-adminPublishedResult" options={{title: 'Published Result'}}/>
+      <Stack.Screen name="K-adminPublishedResultDetail" options={{title: 'Published Result Detail'}}/>
+      <Stack.Screen name="L-adminSurveyOverview" options={{title: 'Survey Overview'}}/>
+      <Stack.Screen name="R-employeeList" options={{title:'Employee List'}}/>
+      <Stack.Screen name="s-kpi" options={{title:'KPI'}}/>
+      <Stack.Screen name="t-employeeRecord" options={{title: 'Employee Records'}} />
     </Stack>
   );
 }
