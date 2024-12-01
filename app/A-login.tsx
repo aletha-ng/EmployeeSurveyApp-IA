@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, Button, Alert, TextInput, Dimensions, } from 'react-native';
-import { CommonActions } from '@react-navigation/native';
-import { useNavigation } from 'expo-router';
+import React, {useState} from 'react';
+import {Text, View, StyleSheet, Button, Alert, TextInput, Dimensions} from 'react-native';
+import {CommonActions} from '@react-navigation/native';
+import {useNavigation} from 'expo-router';
 
-const { width, height } = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const app = () => {
   const navigation = useNavigation();
@@ -18,7 +18,7 @@ const app = () => {
 
   //Button States
   const [buttonSelected, setbuttonSelectedState] = useState<ButtonType | null>(null);
-  const handlePress = (button: ButtonType) => {
+  const switchPage = (button: ButtonType) => {
     if (buttonSelected === button) {
       setbuttonSelectedState(null);
       setUserRoleStatus(false);
@@ -37,12 +37,15 @@ const app = () => {
   const login = () => {
     if (!buttonSelected) {
       setLoginErrorState(true);
-      Alert.alert('Error', 'Please select either Admin or Employee to proceed.');
+      Alert.alert('Please select either Admin or Employee to proceed.');
       return; 
     }
 
     //This shuold be replaced with the database of logging in
-    const validLogin = email === 'admin@example.com' && password === 'admin123';
+    const validLogin = testData.find(
+      (user) => user.email === email && user.password === password && user.role === buttonSelected
+    );
+  
     if (!validLogin) {
       setLoginErrorState(true);
     }
@@ -81,7 +84,7 @@ const app = () => {
         <Button
           title="Admin"
           color="black"
-          onPress={() => handlePress('Admin')}
+          onPress={() => switchPage('Admin')}
         />
       </View>
 
@@ -89,7 +92,7 @@ const app = () => {
         <Button
           title="Employee"
           color="black"
-          onPress={() => handlePress('User')}
+          onPress={() => switchPage('User')}
         />
       </View>
     </View>

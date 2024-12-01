@@ -1,14 +1,7 @@
 import React, {useState} from 'react';
-import {
-    Text, 
-    View,
-    StyleSheet,
-    Alert,
-    Dimensions,
-    Button,
-} from 'react-native';
-import { CommonActions } from '@react-navigation/native';
+import {Text, View, StyleSheet, Alert, Dimensions, Button} from 'react-native';
 import { useNavigation } from 'expo-router';
+import SurveyTitle from './components/surveyTitle';
 
 
 //Universal Constants
@@ -17,36 +10,39 @@ const DEFAULT_PADDING = 10;
 const DEFAULT_MARGIN = 10;
 
 
-
 const app = () => {
   const navigation = useNavigation();
   const [isPressed, setIsPressed] = useState(false);
+  const [showSurveyTitle, setShowSurveyTitle] = useState(false);
   
   const handlePress = async () => {
     setIsPressed(true);
     Alert.alert(`Button pressed`);
   };
-  
-    const [isChecked, setIsChecked] = useState(false);
-  
-    //Layout 
-    return (
-      <View style = {styles.mainContainer}>
-        <View style = {styles.adminMenuButton}>
-            <Button
-            title='create new'
-            onPress={handlePress}
-            />
-        </View>
 
-        <View style = {styles.adminMenuButton}>
-            <Button
-            title='edit'
-            onPress={() => navigation.navigate('H-adminSeeSurvey')}
-            />
-        </View>
+  const switchPage = (route: string) => {
+    navigation.navigate(route);
+  };
+  
+  
+  //Layout 
+  return (
+    <View style = {styles.mainContainer}>
+      <View style = {styles.adminMenuButton}>
+          <Button
+          title='create new'
+          onPress={() => switchPage('N-adminMakeSurvey')}
+          />
       </View>
-    );
+
+      <View style = {styles.adminMenuButton}>
+          <Button
+          title='edit'
+          onPress={() => navigation.navigate('H-adminSeeSurvey')}
+          />
+      </View>
+    </View>
+  );
 };
 
 export default app;

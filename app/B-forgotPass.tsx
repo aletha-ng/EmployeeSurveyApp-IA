@@ -14,6 +14,48 @@ const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 20;
 type ButtonType = 'Press'; 
 
+
+const app = () => {
+  //Text Box States
+  const [text, onChangeText] = React.useState('Placeholder');
+
+  //Button States
+  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
+
+  const handlePress = (button: ButtonType) => { // Specify the type here
+    setSelectedButton(button);
+    Alert.alert(`${button} Button pressed`);
+  };
+
+  //Layout 
+  return (
+    <View style = {styles.mainContainer}>
+
+      <View style = {styles.containerBatch}>
+        <View style = {styles.containerBatch1}>
+          <Text style = {styles.heading2}>Email</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangeText}
+            value={text}
+          />
+        </View>
+        <View style = {[styles.shortButton, selectedButton === 'Press' && styles.selectedButton]} >
+        <Button 
+            title="Send Code"
+            color="black"
+            onPress={() => handlePress('Press')} 
+          />
+        </View>
+
+      </View>
+
+    </View>
+  );
+};
+
+export default app;
+
 const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
@@ -98,44 +140,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
-const app = () => {
-  //Text Box States
-  const [text, onChangeText] = React.useState('Placeholder');
-
-  //Button States
-  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
-
-  const handlePress = (button: ButtonType) => { // Specify the type here
-    setSelectedButton(button);
-    Alert.alert(`${button} Button pressed`);
-  };
-
-  //Layout 
-  return (
-    <View style = {styles.mainContainer}>
-
-      <View style = {styles.containerBatch}>
-        <View style = {styles.containerBatch1}>
-          <Text style = {styles.heading2}>Email</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={onChangeText}
-            value={text}
-          />
-        </View>
-        <View style = {[styles.shortButton, selectedButton === 'Press' && styles.selectedButton]} >
-        <Button 
-            title="Send Code"
-            color="black"
-            onPress={() => handlePress('Press')} 
-          />
-        </View>
-
-      </View>
-
-    </View>
-  );
-};
-
-export default app;

@@ -15,19 +15,7 @@ const app = () => {
   //Layout 
   return (
     <View style = {styles.mainContainer}>
-      <View style = {styles.containerBatch}>
-        <Text>No Pending Survey</Text>
-      </View>
-
-      <View style = {styles.containerBatch}>
-        <Pressable 
-        onPress={handlePress}
-        style = {styles.pressableBox}
-        >
-          <Text>Survey Title</Text>
-          <Text>Published Date</Text>
-        </Pressable>
-      </View>
+      <Text>Draft Surveys</Text>
     </View>
   );
 };

@@ -24,7 +24,6 @@ const SurveyTitle = () => {
                     ></Button>
                 </View>
             </View>
-
         </View>
     );
 };
@@ -34,24 +33,24 @@ export default SurveyTitle;
 const styles = StyleSheet.create({
     mainContainer:{
         justifyContent: 'center',
-        width: width * 0.8,
+        width: width * 0.9,
         borderWidth: 1,
         borderRadius: 5,
         padding: 10,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
     },
 
     header:{
         fontSize: 15, 
         fontWeight: 'bold',
-        marginBottom: 5
+        marginBottom: 20
     },
 
     textInput:{
-        width: width * 0.74,
+        width: width * 0.85,
         padding: 5,
         borderWidth: 1,
-        marginBottom: 5
+        marginBottom: 20,
     },
 
     button:{

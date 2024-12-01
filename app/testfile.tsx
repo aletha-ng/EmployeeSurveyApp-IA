@@ -12,6 +12,7 @@ import { Picker } from '@react-native-picker/picker';
 import Dropdown from './components/questionTypeMenu';
 import { DataTable } from 'react-native-paper';
 import QuestionManager from './components/_testFile';
+import SurveyTitle from './components/surveyTitle';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
@@ -48,6 +49,7 @@ const app = () => {
       <View>
         <QuestionManager></QuestionManager>
         <Dropdown></Dropdown>
+        <SurveyTitle></SurveyTitle>
       </View>
     );
   };

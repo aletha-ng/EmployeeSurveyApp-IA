@@ -17,10 +17,10 @@ const DEFAULT_MARGIN = 10;
 
 
 const app = () => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
   
-    const handlePress = (route: string) => {
-      navigation.navigate(route);
+  const handlePress = (route: string) => {
+    navigation.navigate(route);
   };
   
     //Layout 
