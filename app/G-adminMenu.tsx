@@ -50,7 +50,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='KPIs'
-            onPress={() => handlePress('s-kpi')}
+            onPress={() => handlePress('Q-KPI')}
             />
         </View>
 

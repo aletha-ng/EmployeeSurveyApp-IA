@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, FlatList } from 'react-native';
-
-// Assuming the Dropdown component is imported
-import Dropdown from './questionTypeMenu';
+import { View, Text, Button, StyleSheet, FlatList, TextInput } from 'react-native';
+import Dropdown from './questionTypeMenu'; 
 
 const QuestionManager = () => {
     const [questions, setQuestions] = useState([]); // Array to hold question objects
@@ -19,7 +17,7 @@ const QuestionManager = () => {
     };
 
     // Render each question with a Dropdown and a delete button
-    const renderQuestion = ({ item }) => (
+    const renderQuestion = ({item}) => (
         <View style={styles.questionContainer}>
             <Text>Question ID: {item.id}</Text>
             {/* Dropdown to select question type */}
@@ -58,11 +56,14 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        width: '100%',
     },
+
     questionsList: {
         marginTop: 20,
         width: '100%',
     },
+
     questionContainer: {
         marginBottom: 10,
         borderWidth: 1,
@@ -70,5 +71,15 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 10,
         backgroundColor: '#f9f9f9',
+        width: '100%',
+    },
+
+    input: {
+        height: 40,
+        width: '100%',
+        borderColor: 'gray',
+        borderWidth: 1,
+        paddingLeft: 10,
+        marginBottom: 10,
     },
 });

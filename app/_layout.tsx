@@ -17,7 +17,7 @@ export default function RootLayout() {
       <Stack.Screen name="J-adminPublishedResult" options={{title: 'Published Result'}}/>
       <Stack.Screen name="K-adminPublishedResultDetail" options={{title: 'Published Result Detail'}}/>
       <Stack.Screen name="L-adminSurveyOverview" options={{title: 'Survey Overview'}}/>
-      <Stack.Screen name="R-employeeList" options={{title:'Employee List'}}/>
+      <Stack.Screen name="R-employeeList" options={{title:'Employee List (DONT CHANGE)'}}/>
       <Stack.Screen name="s-kpi" options={{title:'KPI'}}/>
       <Stack.Screen name="t-employeeRecord" options={{title: 'Employee Records'}} />
     </Stack>

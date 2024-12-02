@@ -1,84 +1,73 @@
-//might need to delete
-import React, {Component, useState} from 'react';
-import {
-  Text, 
-  View,
-  StyleSheet,
-  Button,
-  Alert,
-  TextInput,
-  Dimensions,
-} from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import Dropdown from './components/questionTypeMenu';
-import { DataTable } from 'react-native-paper';
+import React, { useEffect, useState } from 'react';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import axios from 'axios';
 
-//Universal Constants
-const { width, height } = Dimensions.get('window');
-const DEFAULT_PADDING = 20;
-const DEFAULT_MARGIN = 20;
+const EmployeeListScreen = () => {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch employee list from the backend API
+    axios
+      .get('http://localhost:5001/getEmpList') 
+      .then((response) => {
+        setEmployees(response.data.employees);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError('Failed to load employee records');
+        setLoading(false);
+      });
+  }, []);
+
+  // Render employee data
+  const renderItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <Text style={styles.itemText}>Name: {item.user_name}</Text>
+      <Text style={styles.itemText}>Email: {item.user_email}</Text>
+      <Text style={styles.itemText}>Department: {item.user_department}</Text>
+      <Text style={styles.itemText}>Role: {item.user_role}</Text>
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : error ? (
+        <Text style={styles.errorText}>{error}</Text>
+      ) : (
+        <FlatList
+          data={employees}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.user_id.toString()} // Assuming 'user_id' is the unique ID
+        />
+      )}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  //Container Styles
-  mainContainer: {
-    justifyContent: 'center',
+  container: {
+    flex: 1,
+    padding: 20,
   },
-
-  table: {
-
+  itemContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    marginBottom: 10,
   },
-
-  buttonRow: {
-
+  itemText: {
+    fontSize: 16,
+    color: '#333',
   },
-
-  addPopUp: {
-
+  errorText: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
   },
-
-  deletePopUp:{
-
-  },
-
-
 });
 
-const app = () => {
-    return (
-      <DataTable>
-        <DataTable.Header>
-          <DataTable.Title>Name</DataTable.Title>
-          <DataTable.Title numeric>Age</DataTable.Title>
-          <DataTable.Title numeric>Height (cm)</DataTable.Title>
-        </DataTable.Header>
-  
-        <DataTable.Row>
-          <DataTable.Cell>John Doe</DataTable.Cell>
-          <DataTable.Cell numeric>25</DataTable.Cell>
-          <DataTable.Cell numeric>175</DataTable.Cell>
-        </DataTable.Row>
-  
-        <DataTable.Row>
-          <DataTable.Cell>Jane Smith</DataTable.Cell>
-          <DataTable.Cell numeric>28</DataTable.Cell>
-          <DataTable.Cell numeric>160</DataTable.Cell>
-        </DataTable.Row>
-
-        <DataTable.Row>
-          <DataTable.Cell>Jane Smith</DataTable.Cell>
-          <DataTable.Cell numeric>28</DataTable.Cell>
-          <DataTable.Cell numeric>160</DataTable.Cell>
-        </DataTable.Row>
-  
-        <DataTable.Pagination
-          page={0}
-          numberOfPages={3}
-          onPageChange={(page) => console.log(page)}
-          label="1-2 of 6"
-        />
-      </DataTable>
-    );
-  };
-  
-export default app;
-  
+export default EmployeeListScreen;

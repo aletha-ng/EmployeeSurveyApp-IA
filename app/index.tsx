@@ -4,7 +4,7 @@ import { useNavigation } from "expo-router";
 
 const app = () => {
   const router = useRouter();
-  const nav = useNavigation();
+  const navigation = useNavigation();
 
   return (  
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -13,8 +13,8 @@ const app = () => {
       onPress={() => router.push('/A-login')}  
     />
     <Button
-      title="Go to ForgotPass"
-      onPress={() => router.push('/B-forgotPass')}  
+      title="working current"
+      onPress={() => router.push('/editing_survey')}  
     />
     <Button
       title="Go to ForgotPass2"

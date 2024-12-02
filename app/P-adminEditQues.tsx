@@ -10,12 +10,67 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import Dropdown from './components/questionTypeMenu';
+import QuestionManager from './components/_addQuestionButton';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 20;
 const DEFAULT_MARGIN = 20;
 type ButtonType = 'Admin' | 'User'; 
+
+
+const app = () => {
+  const [selectedValue, setSelectedValue] = useState("Option 1");
+
+  //Button States
+  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
+
+  const handlePress = (button: ButtonType) => { // Specify the type here
+    setSelectedButton(button);
+    Alert.alert(`${button} Button pressed`);
+  };
+
+  //Layout 
+  return (
+    <View style = {styles.mainContainer}>
+      <View style = {styles.containerRow}>
+        <View style = {styles.shortButton}>
+          <QuestionManager></QuestionManager>
+            
+        </View>
+        <View style = {styles.shortButton}>
+            <Button
+              title="add page"
+              onPress={() => Alert.alert(' button pressed')}
+            />
+        </View>
+      </View>
+
+      <View style = {styles.containerBatch}>
+        <Dropdown/>
+      </View>
+
+      <View style = {styles.containerRow}>
+        <Button
+          title = 'publish'
+          onPress={() => Alert.alert(' button pressed')}
+        />
+        <Button
+          title = 'save'
+          onPress={() => Alert.alert(' button pressed')}
+        />
+        <Button
+          title = 'add page'
+          onPress={() => Alert.alert(' button pressed')}
+        />
+
+      </View>
+
+    </View>
+  );
+};
+
+export default app;
 
 const styles = StyleSheet.create({
   //Container Styles
@@ -107,60 +162,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
-const app = () => {
-  const [selectedValue, setSelectedValue] = useState("Option 1");
-
-  //Button States
-  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
-
-  const handlePress = (button: ButtonType) => { // Specify the type here
-    setSelectedButton(button);
-    Alert.alert(`${button} Button pressed`);
-  };
-
-  //Layout 
-  return (
-    <View style = {styles.mainContainer}>
-
-
-      <View style = {styles.containerRow}>
-        <View style = {styles.shortButton}>
-            <Button
-              title="add ques"
-              onPress={() => Alert.alert(' button pressed')}
-            />
-        </View>
-        <View style = {styles.shortButton}>
-            <Button
-              title="add page"
-              onPress={() => Alert.alert(' button pressed')}
-            />
-        </View>
-      </View>
-
-      <View style = {styles.containerBatch}>
-        <Dropdown/>
-      </View>
-
-      <View style = {styles.containerRow}>
-        <Button
-          title = 'publish'
-          onPress={() => Alert.alert(' button pressed')}
-        />
-        <Button
-          title = 'save'
-          onPress={() => Alert.alert(' button pressed')}
-        />
-        <Button
-          title = 'add page'
-          onPress={() => Alert.alert(' button pressed')}
-        />
-
-      </View>
-
-    </View>
-  );
-};
-
-export default app;

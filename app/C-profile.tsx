@@ -1,20 +1,78 @@
 import React, {Component, useState} from 'react';
-import {
-  Text, 
-  View,
-  StyleSheet,
-  Button,
-  Alert,
-  TextInput,
-  Dimensions,
-  Image
-} from 'react-native';
+import {Text, View,StyleSheet,Button,Alert,TextInput,Dimensions,Image} from 'react-native';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 20;
 type ButtonType = 'Press'; 
 
+const app = () => {
+  //Button States
+  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
+
+  const handlePress = (button: ButtonType) => { // Specify the type here
+    setSelectedButton(button);
+    Alert.alert(`${button} Button pressed`);
+  };
+
+  //Layout 
+  return (
+    <View style = {styles.mainContainer}>
+      <View style = {styles.containerRow}>
+        <Button 
+              title="Back"
+              color="black"
+              onPress={() => handlePress('Press')} 
+        />
+        <Text>Profile</Text>      
+        <Image 
+          //source={require('../images/profpicplaceholder.webp')} 
+          style={{ width: 50, height: 50 }} 
+        />
+      </View>
+      
+      <Image 
+          //source={require('../images/profpicplaceholder.webp')} 
+          style={styles.profile} 
+        />
+
+      <View style = {styles.containerBatch}>
+        <Text>Profile Details</Text>
+
+        <View style = {styles.containerBatch1}>
+          <Text>Name</Text>
+          <Text>Email</Text>
+          <Text>ID</Text>
+
+          <View style = {styles.containerRow}>
+            <Text>Language</Text>
+            <Button 
+              title="English"
+              color="black"
+              onPress={() => handlePress('Press')} 
+              />
+              <Button 
+              title="Indo"
+              color="black"
+              onPress={() => handlePress('Press')} 
+              />
+          </View>
+
+          <Button 
+              title="Logout"
+              color="black"
+              onPress={() => handlePress('Press')} 
+              />
+        </View>
+
+
+      </View>
+
+    </View>
+  );
+};
+
+export default app;
 const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
@@ -98,71 +156,3 @@ const styles = StyleSheet.create({
   },
 
 });
-
-const app = () => {
-  //Button States
-  const [selectedButton, setSelectedButton] = useState<ButtonType | null>(null);
-
-  const handlePress = (button: ButtonType) => { // Specify the type here
-    setSelectedButton(button);
-    Alert.alert(`${button} Button pressed`);
-  };
-
-  //Layout 
-  return (
-    <View style = {styles.mainContainer}>
-      <View style = {styles.containerRow}>
-        <Button 
-              title="Back"
-              color="black"
-              onPress={() => handlePress('Press')} 
-        />
-        <Text>Profile</Text>      
-        <Image 
-          //source={require('../images/profpicplaceholder.webp')} 
-          style={{ width: 50, height: 50 }} 
-        />
-      </View>
-      
-      <Image 
-          //source={require('../images/profpicplaceholder.webp')} 
-          style={styles.profile} 
-        />
-
-      <View style = {styles.containerBatch}>
-        <Text>Profile Details</Text>
-
-        <View style = {styles.containerBatch1}>
-          <Text>Name</Text>
-          <Text>Email</Text>
-          <Text>ID</Text>
-
-          <View style = {styles.containerRow}>
-            <Text>Language</Text>
-            <Button 
-              title="English"
-              color="black"
-              onPress={() => handlePress('Press')} 
-              />
-              <Button 
-              title="Indo"
-              color="black"
-              onPress={() => handlePress('Press')} 
-              />
-          </View>
-
-          <Button 
-              title="Logout"
-              color="black"
-              onPress={() => handlePress('Press')} 
-              />
-        </View>
-
-
-      </View>
-
-    </View>
-  );
-};
-
-export default app;

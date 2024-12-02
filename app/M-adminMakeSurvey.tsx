@@ -15,15 +15,9 @@ const app = () => {
   const [isPressed, setIsPressed] = useState(false);
   const [showSurveyTitle, setShowSurveyTitle] = useState(false);
   
-  const handlePress = async () => {
-    setIsPressed(true);
-    Alert.alert(`Button pressed`);
-  };
-
   const switchPage = (route: string) => {
     navigation.navigate(route);
   };
-  
   
   //Layout 
   return (
@@ -38,7 +32,7 @@ const app = () => {
       <View style = {styles.adminMenuButton}>
           <Button
           title='edit'
-          onPress={() => navigation.navigate('H-adminSeeSurvey')}
+          onPress={() => navigation.navigate('draft_Surveys')}
           />
       </View>
     </View>

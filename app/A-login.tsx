@@ -23,7 +23,9 @@ const app = () => {
     if (buttonSelected === button) {
       setbuttonSelectedState(null);
       setUserRoleStatus(false);
-    } else {
+    } 
+    
+    else {
       setbuttonSelectedState(button);
     }
   };
@@ -34,26 +36,25 @@ const app = () => {
       Alert.alert('Please select either Admin or Employee to proceed.');
       return; 
     }
-
+  
     try {
-      // Send login data to backend API
-      const response = await axios.post('http://localhost:5001/login', {
+      const response = await axios.post('http://192.168.9.255:5001/login', {
         user_email: email,
         user_password: password,
         user_role: buttonSelected
       });
-
-      // If login is successful
+  
+      //If login is successful
       setLoginErrorState(false);
-      
-      // Navigate based on role
+      const {user_role} = response.data;  //Get the role from the response
+  
       let route;
-      if (buttonSelected === 'Admin') {
+      if (user_role === 'Admin') {
         route = 'G-adminMenu';
       } else {
         route = 'D-menuEmployee';
       }
-
+  
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -65,11 +66,11 @@ const app = () => {
     catch (error) {
       // Handle login failure
       setLoginErrorState(true);
-      console.error('Login failed', error);
+      console.error('Login fail', error);
       Alert.alert('Invalid email, password, or role');
-
     }
   }
+  
 
   //Layout 
   return (
@@ -132,21 +133,6 @@ const app = () => {
           title="Forgot Password"
         />
       </View>
-    </View>
-
-
-    <View style={styles.containerBatch3}>
-      {(() => {
-        if (loginErrror) {
-          return <Text style={styles.heading2}>Invalid email or password</Text>;
-        }
-        else if (!userRoleStatus) {
-            return <Text style={styles.heading2}>Please select either 'Admin' or 'Employee</Text>
-        }
-        else {
-          return null;
-        }
-      })()}
     </View>
   </View>
   );
