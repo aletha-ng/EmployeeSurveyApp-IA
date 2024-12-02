@@ -24,14 +24,14 @@ const app = () => {
     <View style = {styles.mainContainer}>
       <View style = {styles.adminMenuButton}>
           <Button
-          title='create new'
+          title='Create new'
           onPress={() => switchPage('N-adminMakeSurvey')}
           />
       </View>
 
       <View style = {styles.adminMenuButton}>
           <Button
-          title='edit'
+          title='Edit'
           onPress={() => navigation.navigate('draft_Surveys')}
           />
       </View>
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     //Container Styles
     mainContainer: {
       alignItems: 'center',
-      borderWidth: 1,
     },
   
     containerRow: {

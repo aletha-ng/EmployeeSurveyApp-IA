@@ -225,7 +225,7 @@ export default Dropdown;
 
 const styles = StyleSheet.create({
     mainContainer: {
-        width: width * 0.8,
+        width: width * 0.7,
         borderWidth: 1,
         borderRadius: 5,
         padding: 5,

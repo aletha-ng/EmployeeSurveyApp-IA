@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet, FlatList, TextInput } from 'react-native';
-import Dropdown from './questionTypeMenu'; // Assuming this is correctly implemented
+import Dropdown from './questionTypeMenu'; 
 
 const QuestionManager = () => {
     const addQuestion = () => {

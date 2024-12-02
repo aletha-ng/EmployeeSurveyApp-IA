@@ -36,9 +36,9 @@ app.post('/login', async (req, res) => {
           return res.status(402).json({ message: 'User not found or role mismatch' });
         }
   
-        const user = results[0]; // Assuming only one result is returned
+        const user = results[0]; 
   
-        // Compare the provided password with the stored hashed password
+        //Compare password with the stored hashed password
         const isPasswordValid = await bcrypt.compare(user_password, user.password);
   
         if (!isPasswordValid) {
@@ -67,7 +67,49 @@ app.get('/getEmpList', (req, res) => {
     });
 });
 
+app.get('/api/retention-rate', (req, res) => {
+    const query = 'SELECT employee_at_start, employee_at_end FROM kpi';
 
+    db.query(query, (err, results) => {
+        if (err) {
+          console.error('Error fetching data:', err);
+          return res.status(500).send('Error fetching data');
+        }
+        
+        // Send the results back as JSON
+        res.json(results);
+      });
+});
+      
+app.get('/api/turnover-rate', (req, res) => {
+    const query = 'SELECT employee_left_company, employee_stayed_company FROM kpi';
+
+    db.query(query, (err, results) => {
+        if (err) {
+          console.error('Error fetching data:', err);
+          return res.status(500).send('Error fetching data');
+        }
+        
+        // Send the results back as JSON
+        res.json(results);
+    });
+
+});
+  
+app.get('/api/satisfaction-ratings', (req, res) => {
+    const query = 'SELECT rating_1, rating_2, rating_3, rating_4, rating_5 FROM kpi_sat_rate';
+
+    db.query(query, (err, results) => {
+        if (err) {
+          console.error('Error fetching data:', err);
+          return res.status(500).send('Error fetching data');
+        }
+        
+        // Send the results back as JSON
+        res.json(results);
+    });
+    
+});
 
 app.get('/data', (req, res) => {
   const queryResults = {};
