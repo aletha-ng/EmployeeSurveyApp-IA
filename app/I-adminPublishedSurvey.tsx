@@ -6,6 +6,7 @@ import {
     Alert,
     Dimensions,
     Button,
+    ScrollView
   } from 'react-native';
 
 
@@ -18,7 +19,6 @@ const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
     alignItems: 'center',
-    borderWidth: 1,
   },
 
   containerRow: {
@@ -130,15 +130,14 @@ const app = () => {
   
     //Layout 
     return (
-      <View style = {styles.mainContainer}>
-        <Text style = {styles.heading2}>Published Surveys</Text>
+      <ScrollView contentContainerStyle={{alignItems: 'center'}}>
         <View style = {styles.adminMenuButton}>
             <Button
-            title='Survey Titlle (Change button to a box touchable)'
+            title='Survey Title'
             onPress={handlePress}
             />
         </View>
-      </View>
+      </ScrollView>
     );
   };
   

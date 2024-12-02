@@ -57,7 +57,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='Employee Record'
-            onPress={() => handlePress('t-employeeRecord')}
+            onPress={() => handlePress('R-employeeList')}
             />
         </View>  
       </View>

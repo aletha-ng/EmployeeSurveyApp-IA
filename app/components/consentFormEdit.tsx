@@ -12,7 +12,7 @@ const ConsentForm = () => {
 
     return (
         <View style = {styles.mainContainer}>
-            <Text style = {styles.header}>Consent Form</Text>
+            <Text style = {styles.header}>Insert Consent Form Here</Text>
             <TextInput style = {styles.placeholder} multiline={true}></TextInput>
 
             <View style = {styles.containerRow}>

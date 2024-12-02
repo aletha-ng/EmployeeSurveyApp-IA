@@ -14,7 +14,7 @@ const app = () => {
     />
     <Button
       title="working current"
-      onPress={() => router.push('/editing_survey')}  
+      onPress={() => router.push('/_editingArea')}  
     />
     <Button
       title="Go to ForgotPass2"
