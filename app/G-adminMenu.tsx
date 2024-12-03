@@ -29,6 +29,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='See Surveys'
+            color='white'
             onPress={() => handlePress('H-adminSeeSurvey')}
             />
         </View>
@@ -36,6 +37,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='Make Surveys'
+            color='white'
             onPress={() => handlePress('M-adminMakeSurvey')}
             />
         </View>
@@ -43,6 +45,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='Survey Overview'
+            color='white'
             onPress={() => handlePress('L-adminSurveyOverview')}
             />
         </View>
@@ -50,6 +53,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='KPIs'
+            color='white'
             onPress={() => handlePress('Q-KPI')}
             />
         </View>
@@ -57,6 +61,7 @@ const app = () => {
         <View style = {styles.adminMenuButton}>
             <Button
             title='Employee Record'
+            color='white'
             onPress={() => handlePress('R-employeeList')}
             />
         </View>  
@@ -70,7 +75,9 @@ export default app;
 const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
+    flex: 1,
     alignItems: 'center',
+    backgroundColor: '#4682b4'
   },
 
   containerRow: {

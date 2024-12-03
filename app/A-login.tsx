@@ -124,6 +124,7 @@ const app = () => {
       <View style={styles.longButton}>
         <Button
           title="Log In"
+          color='white'
           onPress={login}
         />
       </View>
@@ -131,6 +132,7 @@ const app = () => {
       <View style={styles.longButton}>
         <Button
           title="Forgot Password"
+          color='white'
         />
       </View>
     </View>
@@ -145,7 +147,7 @@ const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
     flex: 1,
-    backgroundColor: '#1c549e',
+    backgroundColor: '#4682b4',
     alignItems: 'center'
   },
 

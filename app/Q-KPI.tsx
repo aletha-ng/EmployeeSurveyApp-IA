@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, TextInput, StyleSheet, Dimensions, ScrollView, ActivityIndicator } from 'react-native';
 import { BarChart, PieChart } from 'react-native-chart-kit';
 
-export default function App() {
+export default function App(){
   const [currentScreen, setCurrentScreen] = useState('Dashboard');
   const [loading, setLoading] = useState(true);
   const [retentionData, setRetentionData] = useState({ start: 0, end: 0 });

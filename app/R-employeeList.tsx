@@ -22,7 +22,7 @@ const EmployeeListScreen = () => {
   }, []);
 
   // Render employee data
-  const renderItem = ({ item }) => (
+  const renderItem = ({item}) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>Name: {item.user_name}</Text>
       <Text style={styles.itemText}>Email: {item.user_email}</Text>
@@ -52,6 +52,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: '#4682b4'
   },
   itemContainer: {
     padding: 10,
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 16,
-    color: '#333',
+    color: 'white',
   },
   errorText: {
     fontSize: 18,
