@@ -22,27 +22,35 @@ db.connect(err => {
 
 //Login Function
 app.post('/login', async (req, res) => {
-    const{user_email, user_password, user_role} = req.body;
+    console.log('Passed 1');
+    const{email, password, role} = req.body;
   
     try {
+      console.log('Passed 2');
       //Query to find user by email and role
       const query = 'SELECT * FROM user_detail WHERE user_email = ? AND user_role = ?';
-      
-      db.query(query, [user_email, user_role], async (err, results) => {
+
+      console.log('Passed 3');
+      db.query(query, [email, role], async (err, results) => {
         if(err){
+          console.log('problem here 1');
           return res.status(500).json({ message: 'An error occurred while querying the database.' });
         }
   
+        console.log(email);
+
         if (results.length === 0) {
+          console.log('problem here 2');
           return res.status(402).json({ message: 'User not found or role mismatch' });
         }
   
         const user = results[0]; 
   
         //Compare password with the stored hashed password
-        const isPasswordValid = await bcrypt.compare(user_password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
   
         if (!isPasswordValid) {
+          console.log('problem here 3');
           return res.status(401).json({ message: 'Invalid password' });
         }
   
@@ -51,6 +59,7 @@ app.post('/login', async (req, res) => {
       });
     } catch (error) {
       console.error(error);
+      console.log('problem here 4');
       res.status(501).json({ message: 'An error occurred' });
     }
 });
