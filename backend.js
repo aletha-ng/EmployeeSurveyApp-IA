@@ -20,15 +20,16 @@ db.connect(err => {
   console.log('Database connected');
 });
 
+//Login Function
 app.post('/login', async (req, res) => {
-    const { user_email, user_password, user_role } = req.body;
+    const{user_email, user_password, user_role} = req.body;
   
     try {
-      // Query to find user by email and role
-      const query = 'SELECT * FROM users WHERE email = ? AND role = ?';
+      //Query to find user by email and role
+      const query = 'SELECT * FROM user_detail WHERE user_email = ? AND user_role = ?';
       
       db.query(query, [user_email, user_role], async (err, results) => {
-        if (err) {
+        if(err){
           return res.status(500).json({ message: 'An error occurred while querying the database.' });
         }
   
@@ -50,7 +51,7 @@ app.post('/login', async (req, res) => {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: 'An error occurred' });
+      res.status(501).json({ message: 'An error occurred' });
     }
 });
     

@@ -38,7 +38,7 @@ const app = () => {
     }
   
     try {
-      const response = await axios.post('http://192.168.9.255:5001/login', {
+      const response = await axios.post('http://localhost:5001/login', {
         user_email: email,
         user_password: password,
         user_role: buttonSelected
@@ -66,7 +66,7 @@ const app = () => {
     catch (error) {
       // Handle login failure
       setLoginErrorState(true);
-      console.error('Login fail', error);
+      console.error('Login failed', error);
       Alert.alert('Invalid email, password, or role');
     }
   }
@@ -141,7 +141,6 @@ const app = () => {
 };
 
 export default app;
-
 
 const styles = StyleSheet.create({
   //Container Styles
