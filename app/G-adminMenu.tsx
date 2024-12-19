@@ -65,6 +65,14 @@ const app = () => {
             onPress={() => handlePress('R-employeeList')}
             />
         </View>  
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Profile'
+            color='white'
+            onPress={() => handlePress('C-profile')}
+            />
+        </View>  
       </View>
     );
   };
