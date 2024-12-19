@@ -22,7 +22,6 @@ const App = () => {
 
   return (
     <ScrollView
-      style={styles.mainContainer}
       contentContainerStyle={{ alignItems: 'center' }}
     >
         <Text style={styles.header}>Survey Title </Text>
@@ -82,6 +81,7 @@ export default App;
 const styles = StyleSheet.create({
   mainContainer: {
     margin: 20,
+    backgroundColor: '#4682b4'
   },
 
   row: {

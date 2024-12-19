@@ -22,7 +22,7 @@ const app = () => {
           <View style = {styles.containerBatch}>
             <View style = {styles.containerRow}>
             <Text>Survey Number</Text>
-            <Text>innput later</Text>
+            <Text>input later</Text>
           </View>
 
           <View style = {styles.containerRow}>

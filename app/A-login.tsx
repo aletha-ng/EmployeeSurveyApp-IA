@@ -1,153 +1,122 @@
-import React, {useState} from 'react';
-import {Text, View, StyleSheet, Button, Alert, TextInput, Dimensions} from 'react-native';
-import {CommonActions} from '@react-navigation/native';
-import {useNavigation} from 'expo-router';
-import axios from 'axios'; 
+import React, { useState } from 'react';
+import { Text, View, StyleSheet, Button, Alert, TextInput, Dimensions } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
+import { useNavigation } from 'expo-router';
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
-const app = () => {
+const App = () => {
   const navigation = useNavigation();
-  const [loginErrror, setLoginErrorState] = useState(false);
-  const [userRoleStatus, setUserRoleStatus] = useState(true);
+  const [loginError, setLoginErrorState] = useState(false);
+  const [buttonSelected, setButtonSelectedState] = useState<'Admin' | 'User' | null>(null);
 
-  type ButtonType = 'Admin' | 'User';
+  // Text Box States
+  const [email, onChangeEmail] = useState('');
+  const [password, onChangePass] = useState('');
 
-  //Text Box States
-  const [email, onChangeEmail] = React.useState('');
-  const [password, onChangePass] = React.useState('');
-
-  //Button States
-  const [buttonSelected, setbuttonSelectedState] = useState<ButtonType | null>(null);
-  const switchPage = (button: ButtonType) => {
+  const switchPage = (button: 'Admin' | 'User') => {
     if (buttonSelected === button) {
-      setbuttonSelectedState(null);
-      setUserRoleStatus(false);
-    } 
-    
-    else {
-      setbuttonSelectedState(button);
+      setButtonSelectedState(null);
+    } else {
+      setButtonSelectedState(button);
     }
   };
 
-  const login = async () => {
+  const login = () => {
     if (!buttonSelected) {
       setLoginErrorState(true);
       Alert.alert('Please select either Admin or Employee to proceed.');
-      return; 
+      return;
     }
-  
-    try {
-      const response = await axios.post('http://localhost:5001/login', {
-        user_email: email,
-        user_password: password,
-        user_role: buttonSelected
-      });
-  
-      //If login is successful
-      setLoginErrorState(false);
-      const {user_role} = response.data;  //Get the role from the response
-  
-      let route;
-      if (user_role === 'Admin') {
-        route = 'G-adminMenu';
-      } else {
-        route = 'D-menuEmployee';
-      }
-  
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: route }],
-        })
-      );
-    } 
-    
-    catch (error) {
-      // Handle login failure
-      setLoginErrorState(true);
-      console.error('Login failed', error);
-      Alert.alert('Invalid email, password, or role');
-    }
-  }
-  
 
-  //Layout 
+    // For the purpose of the frontend-only app, assume successful login based on role
+    setLoginErrorState(false);
+
+    // Navigate based on the selected role
+    const route = buttonSelected === 'Admin' ? 'G-adminMenu' : 'D-menuEmployee';
+
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: route }],
+      })
+    );
+  };
+
   return (
     <View style={styles.mainContainer}>
-
-    <View style={styles.heading}>
-      <Text style={styles.heading}>Login</Text>
-    </View>
-
-    <View style={styles.containerRow}>
-      <View style={[styles.shortButton, buttonSelected === 'Admin' && styles.buttonSelected]} >
-        <Button
-          title="Admin"
-          color="black"
-          onPress={() => switchPage('Admin')}
-        />
+      <View style={styles.heading}>
+        <Text style={styles.heading}>Login</Text>
       </View>
 
-      <View style={[styles.shortButton, buttonSelected === 'User' && styles.buttonSelected]} >
-        <Button
-          title="Employee"
-          color="black"
-          onPress={() => switchPage('User')}
-        />
-      </View>
-    </View>
+      <View style={styles.containerRow}>
+        <View style={[styles.shortButton, buttonSelected === 'Admin' && styles.buttonSelected]}>
+          <Button
+            title="Admin"
+            color="black"
+            onPress={() => switchPage('Admin')}
+          />
+        </View>
 
-    <View style={styles.containerBatch}>
-      <View>
-        <Text style={styles.heading2}>Email</Text>
+        <View style={[styles.shortButton, buttonSelected === 'User' && styles.buttonSelected]}>
+          <Button
+            title="Employee"
+            color="black"
+            onPress={() => switchPage('User')}
+          />
+        </View>
+      </View>
+
+      <View style={styles.containerBatch}>
+        <View>
+          <Text style={styles.heading2}>Email</Text>
           <TextInput
             style={styles.input}
             onChangeText={onChangeEmail}
             value={email}
             autoCapitalize="none"
           />
+        </View>
+
+        <View>
+          <Text style={styles.heading2}>Password</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={onChangePass}
+            value={password}
+            autoCapitalize="none"
+            secureTextEntry
+          />
+        </View>
       </View>
 
-      <View>
-        <Text style={styles.heading2}>Password</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChangePass}
-          value={password}
-          autoCapitalize="none"
-        />
+      <View style={styles.containerBatch2}>
+        <View style={styles.longButton}>
+          <Button
+            title="Log In"
+            color="white"
+            onPress={login}
+          />
+        </View>
+
+        <View style={styles.longButton}>
+          <Button
+            title="Forgot Password"
+            color="white"
+          />
+        </View>
       </View>
     </View>
-
-    <View style={styles.containerBatch2}>
-      <View style={styles.longButton}>
-        <Button
-          title="Log In"
-          color='white'
-          onPress={login}
-        />
-      </View>
-
-      <View style={styles.longButton}>
-        <Button
-          title="Forgot Password"
-          color='white'
-        />
-      </View>
-    </View>
-  </View>
   );
 };
 
-export default app;
+export default App;
 
 const styles = StyleSheet.create({
-  //Container Styles
   mainContainer: {
     flex: 1,
     backgroundColor: '#4682b4',
-    alignItems: 'center'
+    alignItems: 'center',
   },
 
   containerRow: {
@@ -166,29 +135,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  containerBatch3: {
-    alignItems: 'center',
-    margin: 10,
-  },
-
-  //Text Styles
   heading: {
     alignItems: 'center',
     padding: 20,
     fontFamily: 'arial',
     fontWeight: 'bold',
     fontSize: 30,
-    color: 'white'
+    color: 'white',
   },
 
   heading2: {
     fontFamily: 'arial',
     fontWeight: 'bold',
     fontSize: 15,
-    color: 'white'
+    color: 'white',
   },
 
-  //Component Styles
   input: {
     height: height * 0.05,
     width: width * 0.8,
@@ -204,7 +166,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: width * 0.4,
     height: height * 0.05,
-    margin: 10
+    margin: 10,
   },
 
   longButton: {
@@ -214,12 +176,6 @@ const styles = StyleSheet.create({
     width: width * 0.6,
     height: height * 0.05,
     margin: 10,
-  },
-
-  button: {
-    backgroundColor: '#3498db',
-    width: 100,
-    height: 100,
   },
 
   buttonSelected: {

@@ -6,8 +6,7 @@ import {
     Alert,
     Dimensions,
     Button,
-  } from 'react-native';
-
+} from 'react-native';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');

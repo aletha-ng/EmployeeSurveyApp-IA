@@ -24,6 +24,7 @@ const EmployeeListScreen = () => {
   // Render employee data
   const renderItem = ({item}) => (
     <View style={styles.itemContainer}>
+      <Text style={styles.itemText}>ID: {item.user_id}</Text>
       <Text style={styles.itemText}>Name: {item.user_name}</Text>
       <Text style={styles.itemText}>Email: {item.user_email}</Text>
       <Text style={styles.itemText}>Department: {item.user_department}</Text>

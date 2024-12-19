@@ -5,6 +5,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');  
 const app = express();
 const port = 5001;
+
 app.use(cors());
 app.use(express.json());
 
@@ -20,153 +21,113 @@ db.connect(err => {
   console.log('Database connected');
 });
 
-//Login Function
-app.post('/login', async (req, res) => {
-    console.log('Passed 1');
-    const{email, password, role} = req.body;
-  
-    try {
-      console.log('Passed 2');
-      //Query to find user by email and role
-      const query = 'SELECT * FROM user_detail WHERE user_email = ? AND user_role = ?';
-
-      console.log('Passed 3');
-      db.query(query, [email, role], async (err, results) => {
-        if(err){
-          console.log('problem here 1');
-          return res.status(500).json({ message: 'An error occurred while querying the database.' });
-        }
-  
-        console.log(email);
-
-        if (results.length === 0) {
-          console.log('problem here 2');
-          return res.status(402).json({ message: 'User not found or role mismatch' });
-        }
-  
-        const user = results[0]; 
-  
-        //Compare password with the stored hashed password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-  
-        if (!isPasswordValid) {
-          console.log('problem here 3');
-          return res.status(401).json({ message: 'Invalid password' });
-        }
-  
-        // Return user role on success
-        res.json({ message: 'Login successful', user_role: user.role });
-      });
-    } catch (error) {
-      console.error(error);
-      console.log('problem here 4');
-      res.status(501).json({ message: 'An error occurred' });
-    }
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });
-    
+
+//Function That Work - DONT CHANGE 
 app.get('/getEmpList', (req, res) => {
-    const query = 'SELECT * FROM user_detail';
-  
-    db.query(query, (err, results) => {
-      if (err) {
-        res.status(500).json({ error: 'Database error' });
-      } else {
-        res.status(200).json({ employees: results });
-        console.log('success');
-      }
-    });
+  const query = 'SELECT * FROM user_detail';
+  db.query(query, (err, results) => {
+    if (err) {
+      res.status(500).json({ error: 'Database error' });
+    } else {
+      res.status(200).json({ employees: results });
+      console.log('success');
+    }
+  });
 });
 
+//Function That Work but May still need to be edited 
 app.get('/api/retention-rate', (req, res) => {
-    const query = 'SELECT employee_at_start, employee_at_end FROM kpi';
+  const query = 'SELECT employee_at_start, employee_at_end FROM kpi';
 
-    db.query(query, (err, results) => {
-        if (err) {
-          console.error('Error fetching data:', err);
-          return res.status(500).send('Error fetching data');
-        }
-        
-        // Send the results back as JSON
-        res.json(results);
-      });
-});
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
       
-app.get('/api/turnover-rate', (req, res) => {
-    const query = 'SELECT employee_left_company, employee_stayed_company FROM kpi';
-
-    db.query(query, (err, results) => {
-        if (err) {
-          console.error('Error fetching data:', err);
-          return res.status(500).send('Error fetching data');
-        }
-        
-        // Send the results back as JSON
-        res.json(results);
+      // Send the results back as JSON
+      res.json(results);
     });
+});
+    
+app.get('/api/turnover-rate', (req, res) => {
+  const query = 'SELECT employee_left_company, employee_stayed_company FROM kpi';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+      
+      // Send the results back as JSON
+      res.json(results);
+  });
 
 });
-  
-app.get('/api/satisfaction-ratings', (req, res) => {
-    const query = 'SELECT rating_1, rating_2, rating_3, rating_4, rating_5 FROM kpi_sat_rate';
 
-    db.query(query, (err, results) => {
-        if (err) {
-          console.error('Error fetching data:', err);
-          return res.status(500).send('Error fetching data');
-        }
-        
-        // Send the results back as JSON
-        res.json(results);
-    });
-    
+app.get('/api/satisfaction-ratings', (req, res) => {
+  const query = 'SELECT rating_1, rating_2, rating_3, rating_4, rating_5 FROM kpi_sat_rate';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+      
+      // Send the results back as JSON
+      res.json(results);
+  });
+  
 });
 
 app.get('/data', (req, res) => {
-  const queryResults = {};
+const queryResults = {};
 
-  db.query('SELECT * FROM user_detail', (err, result) => {
-    if (err) return res.status(502).json({error: err.message });
-    queryResults.user_detail = result;
+db.query('SELECT * FROM user_detail', (err, result) => {
+  if (err) return res.status(502).json({error: err.message });
+  queryResults.user_detail = result;
 
-    db.query('SELECT * FROM survey', (err, result) => {
-      if (err) return res.status(503).json({error: err.message });
-      queryResults.survey = result;
+  db.query('SELECT * FROM survey', (err, result) => {
+    if (err) return res.status(503).json({error: err.message });
+    queryResults.survey = result;
 
-      db.query('SELECT * FROM question', (err, result) => {
-        if (err) return res.status(504).json({error: err.message });
-        queryResults.question = result;
+    db.query('SELECT * FROM question', (err, result) => {
+      if (err) return res.status(504).json({error: err.message });
+      queryResults.question = result;
 
-        db.query('SELECT * FROM option_multiple_choice', (err, result) => {
-          if (err) return res.status(505).json({error: err.message });
-          queryResults.option_multiple_choice = result;
+      db.query('SELECT * FROM option_multiple_choice', (err, result) => {
+        if (err) return res.status(505).json({error: err.message });
+        queryResults.option_multiple_choice = result;
 
-          db.query('SELECT * FROM option_ratings', (err, result) => {
-            if (err) return res.status(506).json({ error: err.message });
-            queryResults.option_ratings = result;
+        db.query('SELECT * FROM option_ratings', (err, result) => {
+          if (err) return res.status(506).json({ error: err.message });
+          queryResults.option_ratings = result;
 
-            db.query('SELECT * FROM option_written', (err, result) => {
-              if (err) return res.status(507).json({ error: err.message });
-              queryResults.written = result;
+          db.query('SELECT * FROM option_written', (err, result) => {
+            if (err) return res.status(507).json({ error: err.message });
+            queryResults.written = result;
 
-              db.query('SELECT * FROM response', (err, result) => {
-                if (err) return res.status(508).json({ error: err.message });
-                queryResults.response = result;
+            db.query('SELECT * FROM response', (err, result) => {
+              if (err) return res.status(508).json({ error: err.message });
+              queryResults.response = result;
 
-                db.query('SELECT * FROM response_detail', (err, result) => {
-                  if (err) return res.status(509).json({ error: err.message });
-                  queryResults.response_detail = result;
+              db.query('SELECT * FROM response_detail', (err, result) => {
+                if (err) return res.status(509).json({ error: err.message });
+                queryResults.response_detail = result;
 
-                  db.query('SELECT * FROM password_change', (err, result) => {
-                    if (err) return res.status(510).json({ error: err.message });
-                    queryResults.password_change = result;
+                db.query('SELECT * FROM password_change', (err, result) => {
+                  if (err) return res.status(510).json({ error: err.message });
+                  queryResults.password_change = result;
 
-                    db.query('SELECT * FROM kpi', (err, result) => {
-                      if (err) return res.status(511).json({ error: err.message });
-                      queryResults.kpi = result;
+                  db.query('SELECT * FROM kpi', (err, result) => {
+                    if (err) return res.status(511).json({ error: err.message });
+                    queryResults.kpi = result;
 
-                      // Send the combined results
-                      res.json(queryResults);
-                    });
+                    // Send the combined results
+                    res.json(queryResults);
                   });
                 });
               });
@@ -177,8 +138,37 @@ app.get('/data', (req, res) => {
     });
   });
 });
+});
 
+//CURRENT WORKING 
+app.post('/login', (req, res) => {
+  const {email, password} = req.body; 
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+  const query = 'SELECT * FROM user_detail WHERE user_email = ?';
+  db.query(query, [email], (err, results) => {
+    if(err){
+      console.log('err:', err);  
+      return res.status(500).send('Internal server error');  //
+    }
+
+    if(results.length === 0){
+      console.log('No user found for the provided email');
+      return res.status(404).send('No user found with that email');
+    }
+
+    const user = results[0]; 
+
+    bcrypt.compare(password, user.user_password, (err, isMatch) => {
+      if(err){
+        return res.status(500).send('Error comparing passwords');
+      }
+      
+      if(isMatch){
+        return res.status(200).send({message: 'Login successful', user_role: user.user_role});
+      }
+      else{
+        return res.status(400).send('Wrong password');
+      }
+    })
+  })
 });
