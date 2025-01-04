@@ -1,26 +1,59 @@
-import React, {Component, useState} from 'react';
-import {
-  Text, 
-  View,
-  StyleSheet,
-  Button,
-  Alert,
-  TextInput,
-  Dimensions,
-  Image,
-  Pressable,
-} from 'react-native';
+import React from 'react';
+import {View, StyleSheet, Dimensions, Button,} from 'react-native';
+import {useNavigation} from 'expo-router';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 10; 
 const DEFAULT_MARGIN = 10;
 
+
+const app = () => {
+  const navigation = useNavigation();
+  
+  const handlePress = (route: string) => {
+    navigation.navigate(route);
+  };
+  
+    //Layout 
+    return (
+      <View style = {styles.mainContainer}>
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Submit A Survey'
+            color='white'
+            onPress={() => handlePress('answerSurvey_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Notifications'
+            color='white'
+            onPress={() => handlePress('notifications_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Profile'
+            color='white'
+            onPress={() => handlePress('profile_page')}
+            />
+        </View>
+      </View>
+    );
+  };
+  
+export default app;
+
+
 const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
+    flex: 1,
     alignItems: 'center',
-    borderWidth: 1,
+    backgroundColor: '#4682b4'
   },
 
   containerRow: {
@@ -110,39 +143,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
 
+  adminMenuButton:{
+    margin: DEFAULT_MARGIN,
+    padding: DEFAULT_PADDING,
+    borderWidth: 1,
+    width: width * 0.8,
+    fontSize: 15, 
+  },
 });
-
-const app = () => {
-  const [isPressed, setIsPressed] = useState(false);
-
-  const handlePress = async () => {
-    setIsPressed(true);
-    Alert.alert(`Button pressed`);
-  };
-
-  const [isChecked, setIsChecked] = useState(false);
-
-  //Layout 
-  return (
-    <View style = {styles.mainContainer}>
-     
-     <View style = {styles.surveyConsentTitle}>
-      <Text style = {styles.heading2}>Title</Text>
-     </View>
-
-     <View style = {styles.surveyConsentText}>
-      <Text style = {styles.heading3}>Text</Text>
-     </View>
-
-    <View style = {styles.containerRow}>
-      <Button
-        title='next'
-        onPress={handlePress}
-      />
-    </View>
-
-    </View>
-  );
-};
-
-export default app;

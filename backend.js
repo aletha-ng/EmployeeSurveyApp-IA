@@ -3,6 +3,7 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');  
+const nodemailer = require('nodemailer');
 const app = express();
 const port = 5001;
 
@@ -140,7 +141,6 @@ db.query('SELECT * FROM user_detail', (err, result) => {
 });
 });
 
-//CURRENT WORKING 
 app.post('/login', (req, res) => {
   const {email, password} = req.body; 
 
@@ -164,7 +164,12 @@ app.post('/login', (req, res) => {
       }
       
       if(isMatch){
-        return res.status(200).send({message: 'Login successful', user_role: user.user_role});
+        return res.status(200).send({
+          message: 'Login successful',
+          user_role: user.user_role,
+          user_id: user.user_id 
+        });
+
       }
       else{
         return res.status(400).send('Wrong password');
@@ -172,3 +177,10 @@ app.post('/login', (req, res) => {
     })
   })
 });
+
+app.get('/userProfile', (req, res) => {
+  const {id, name, email, department} = req.body;
+})
+
+//CURRENT WORKING 
+

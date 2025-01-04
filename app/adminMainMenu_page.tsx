@@ -1,24 +1,75 @@
-import React, {useState} from 'react';
-import {
-    Text, 
-    View,
-    StyleSheet,
-    Alert,
-    Dimensions,
-    Button,
-    ScrollView
-  } from 'react-native';
-
+import React from 'react';
+import {View, StyleSheet, Dimensions, Button,} from 'react-native';
+import { useNavigation } from 'expo-router';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
 const DEFAULT_PADDING = 10; 
 const DEFAULT_MARGIN = 10;
 
+
+const app = () => {
+  const navigation = useNavigation();
+  
+  const handlePress = (route: string) => {
+    navigation.navigate(route);
+  };
+  
+    //Layout 
+    return (
+      <View style = {styles.mainContainer}>
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Employee Responses'
+            color='white'
+            onPress={() => handlePress('response_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Company KPIs'
+            color='white'
+            onPress={() => handlePress('kpi_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Employee Records'
+            color='white'
+            onPress={() => handlePress('employeeRecords_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Notify Employees'
+            color='white'
+            onPress={() => handlePress('email_page')}
+            />
+        </View>
+
+        <View style = {styles.adminMenuButton}>
+            <Button
+            title='Profile'
+            color='white'
+            onPress={() => handlePress('profile_page')}
+            />
+        </View>  
+      </View>
+    );
+  };
+  
+export default app;
+
+
 const styles = StyleSheet.create({
   //Container Styles
   mainContainer: {
+    flex: 1,
     alignItems: 'center',
+    backgroundColor: '#4682b4'
   },
 
   containerRow: {
@@ -115,30 +166,4 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     fontSize: 15, 
   },
-
 });
-
-const app = () => {
-    const [isPressed, setIsPressed] = useState(false);
-  
-    const handlePress = async () => {
-      setIsPressed(true);
-      Alert.alert(`Button pressed`);
-    };
-  
-    const [isChecked, setIsChecked] = useState(false);
-  
-    //Layout 
-    return (
-      <ScrollView contentContainerStyle={{alignItems: 'center'}}>
-        <View style = {styles.adminMenuButton}>
-            <Button
-            title='Survey Title'
-            onPress={handlePress}
-            />
-        </View>
-      </ScrollView>
-    );
-  };
-  
-  export default app;
