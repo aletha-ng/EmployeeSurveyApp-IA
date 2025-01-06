@@ -28,14 +28,6 @@ const app = () => {
 
         <View style = {styles.adminMenuButton}>
             <Button
-            title='Notifications'
-            color='white'
-            onPress={() => handlePress('notifications_page')}
-            />
-        </View>
-
-        <View style = {styles.adminMenuButton}>
-            <Button
             title='Profile'
             color='white'
             onPress={() => handlePress('profile_page')}
@@ -53,7 +45,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#4682b4'
+    backgroundColor: '#4682b4',
   },
 
   containerRow: {

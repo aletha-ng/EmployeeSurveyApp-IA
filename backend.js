@@ -26,121 +26,7 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-//Function That Work - DONT CHANGE 
-app.get('/getEmpList', (req, res) => {
-  const query = 'SELECT * FROM user_detail';
-  db.query(query, (err, results) => {
-    if (err) {
-      res.status(500).json({ error: 'Database error' });
-    } else {
-      res.status(200).json({ employees: results });
-      console.log('success');
-    }
-  });
-});
-
-//Function That Work but May still need to be edited 
-app.get('/api/retention-rate', (req, res) => {
-  const query = 'SELECT employee_at_start, employee_at_end FROM kpi';
-
-  db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-        return res.status(500).send('Error fetching data');
-      }
-      
-      // Send the results back as JSON
-      res.json(results);
-    });
-});
-    
-app.get('/api/turnover-rate', (req, res) => {
-  const query = 'SELECT employee_left_company, employee_stayed_company FROM kpi';
-
-  db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-        return res.status(500).send('Error fetching data');
-      }
-      
-      // Send the results back as JSON
-      res.json(results);
-  });
-
-});
-
-app.get('/api/satisfaction-ratings', (req, res) => {
-  const query = 'SELECT rating_1, rating_2, rating_3, rating_4, rating_5 FROM kpi_sat_rate';
-
-  db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-        return res.status(500).send('Error fetching data');
-      }
-      
-      // Send the results back as JSON
-      res.json(results);
-  });
-  
-});
-
-app.get('/data', (req, res) => {
-const queryResults = {};
-
-db.query('SELECT * FROM user_detail', (err, result) => {
-  if (err) return res.status(502).json({error: err.message });
-  queryResults.user_detail = result;
-
-  db.query('SELECT * FROM survey', (err, result) => {
-    if (err) return res.status(503).json({error: err.message });
-    queryResults.survey = result;
-
-    db.query('SELECT * FROM question', (err, result) => {
-      if (err) return res.status(504).json({error: err.message });
-      queryResults.question = result;
-
-      db.query('SELECT * FROM option_multiple_choice', (err, result) => {
-        if (err) return res.status(505).json({error: err.message });
-        queryResults.option_multiple_choice = result;
-
-        db.query('SELECT * FROM option_ratings', (err, result) => {
-          if (err) return res.status(506).json({ error: err.message });
-          queryResults.option_ratings = result;
-
-          db.query('SELECT * FROM option_written', (err, result) => {
-            if (err) return res.status(507).json({ error: err.message });
-            queryResults.written = result;
-
-            db.query('SELECT * FROM response', (err, result) => {
-              if (err) return res.status(508).json({ error: err.message });
-              queryResults.response = result;
-
-              db.query('SELECT * FROM response_detail', (err, result) => {
-                if (err) return res.status(509).json({ error: err.message });
-                queryResults.response_detail = result;
-
-                db.query('SELECT * FROM password_change', (err, result) => {
-                  if (err) return res.status(510).json({ error: err.message });
-                  queryResults.password_change = result;
-
-                  db.query('SELECT * FROM kpi', (err, result) => {
-                    if (err) return res.status(511).json({ error: err.message });
-                    queryResults.kpi = result;
-
-                    // Send the combined results
-                    res.json(queryResults);
-                  });
-                });
-              });
-            });
-          });
-        });
-      });
-    });
-  });
-});
-});
-
+//Login User - Checking details inputted by users 
 app.post('/login', (req, res) => {
   const {email, password} = req.body; 
 
@@ -178,9 +64,146 @@ app.post('/login', (req, res) => {
   })
 });
 
-app.get('/userProfile', (req, res) => {
-  const {id, name, email, department} = req.body;
-})
+//Employee Records - Take user data from database for display 
+app.get('/getEmpList', (req, res) => {
+  //Fetches all user data from database 
+  const query = 'SELECT * FROM user_detail';
 
-//CURRENT WORKING 
+  //Returns the data if succesfully fetched user data 
+  db.query(query, (err, results) => {
+    if (err) {
+      res.status(500).json({error: 'Database error'});
+    } else {
+      res.status(200).json({employees: results});
+      console.log('success');
+    }
+  });
+});
 
+//Submitting Survey
+app.post('/submitSurvey', (req, res) => {
+  //take user id, ratings, feedback and put into the table. 
+  const {userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate} = req.body;
+
+  //SQL query to insert data into the database
+  const query = 'INSERT INTO survey_responses(user_id, satisfaction_rating, written_type, written_response, submitted_at) VALUES (?, ?, ?, ?, ?)';
+  const values = [userID, feedbackResponse, feedbackType, satisfactionRating, submittedDate];
+
+  db.query(query, values, (err, result) => {
+    if (err) {
+      return res.status(500).send('Error saving survey data');
+    }
+    res.status(200).send('Survey data saved successfully');
+  });
+});
+
+//Fetching Data For Retention Rate
+app.get('/api/retention-rate', (req, res) => {
+  const query = 'SELECT employee_at_start, employee_at_end FROM kpi';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+  
+      res.json(results);
+    });
+});
+    
+//Fetching Data For Turnover Rate
+app.get('/api/turnover-rate', (req, res) => {
+  const query = 'SELECT employee_left_company, employee_stayed_company FROM kpi';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+    
+      res.json(results);
+  });
+});
+
+//Fetching Data For Satisfaction Rating
+app.get('/api/satisfaction-ratings', (req, res) => {
+  const query = 'SELECT rating_1, rating_2, rating_3, rating_4, rating_5 FROM kpi_sat_rate';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+      
+      res.json(results);
+  });
+});
+
+//Fetching Data for Feedbacks from Survey
+app.get('/api/feedbacks', (req, res) => {
+  const query = 'SELECT written_type, written_response FROM survey_responses';
+
+  db.query(query, (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+    
+      res.json(results);
+  });
+});
+
+//Fetching User Data for Profile 
+app.get('/api/user', (req, res) => {
+  const userId = req.query.id;
+
+  const query = 'SELECT user_id, user_name, user_email, department FROM user_detail WHERE user_id = ?';
+
+  db.execute(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching user data:', err);
+      return res.status(500).json({error: 'Failed to fetch user data'});
+    }
+
+    if (results.length > 0) {
+      res.json(results[0]);
+    } else {
+      res.status(404).json({error: 'User not found'});
+    }
+  });
+});
+
+//Send Email
+app.post('/sendEmail', (req, res) => {
+  const {date, content, recipientId} = req.body;
+  
+  //Get recipient's email from database
+  db.query('SELECT email FROM user_detail WHERE user_id = ?', [recipientId], (err, result) => {
+    if (err) {
+      console.error('Error fetching recipient email:', err);
+      return res.status(500).json({ message: 'Error fetching recipient email' });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ message: 'Recipient not found' });
+    }
+
+    const recipientEmail = result[0].email;
+
+    //Send email immediately or schedule it 
+    const mailOptions = {
+      from: senderEmail,
+      to: recipientEmail,
+      subject: 'Scheduled Email',
+      text: content,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error('Error sending email:', err);
+        return res.status(500).json({message: 'Error sending email'});
+      }
+      res.status(200).json({message: 'Email sent successfully', info});
+    });
+  });
+});

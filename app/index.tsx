@@ -13,20 +13,24 @@ const App = () => {
 
   const login = async () => {
     try {
+
+      //Request to backend to check user's details
       const response = await axios.post('http://localhost:5001/login', {
         email: email,
         password: password
       });
   
+      //If details of user are correct 
       if (response.status === 200) {
         const {user_role, user_id} = response.data;
       
         console.log('User role:', user_role);
         console.log('Login successful', response.data);
 
-        // Save user_id in AsyncStorage
+        //Save user_id in AsyncStorage
         await AsyncStorage.setItem('user_id', user_id.toString()); 
 
+        //Setting the routes of main menu page according to user role passed back 
         let route = '';
         if(user_role == 'admin'){
           route = 'adminMainMenu_page';
@@ -35,10 +39,11 @@ const App = () => {
           route = 'employeeMainMenu_page';
         }        
               
+        //Resets navigation states to not allow user return to login page 
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
-            routes: [{ name: route }],
+            routes: [{name: route}],
           })
         );
       }
@@ -91,13 +96,7 @@ const App = () => {
             onPress={login}
           />
         </View>
-
-        <View style={styles.longButton}>
-          <Button
-            title="Forgot Password"
-            color="white"
-          />
-        </View>
+        
       </View>
     </View>
   );

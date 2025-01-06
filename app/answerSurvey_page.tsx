@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, {useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions} from 'react-native';
 
-// Consent Form Component
-const ConsentForm = ({ agreed, setAgreed }) => {
+//Consent Form Component
+const ConsentForm = ({agreed, setAgreed}) => {
     const handleAgree = () => {
         setAgreed(!agreed);
     };
@@ -27,7 +29,7 @@ const ConsentForm = ({ agreed, setAgreed }) => {
     );
 };
 
-// Satisfaction Rating Question Component
+//Satisfaction Rating Question Component
 const SatisfactionRating = ({ selectedRating, setSelectedRating }) => {
     return(
         <View style={styles.satisfactionContainer}>
@@ -56,7 +58,7 @@ const SatisfactionRating = ({ selectedRating, setSelectedRating }) => {
     );
 };
 
-// Written Feedback Question Component
+//Written Feedback Question Component
 const WrittenFeedback = ({ response, setResponse, selectedType, setSelectedType }) => {
     return (
         <View style={styles.surveyContainer}>
@@ -94,14 +96,41 @@ const WrittenFeedback = ({ response, setResponse, selectedType, setSelectedType 
     );
 };
 
-// Main Survey Screen
+//Main Survey Screen
 const SurveyScreen = () => {
     const [agreed, setAgreed] = useState(false);
     const [selectedRating, setSelectedRating] = useState(null);
     const [response, setResponse] = useState('');
     const [selectedType, setSelectedType] = useState(null);
+    const [userId, setUserId] = useState(null);
 
-    const handleSubmit = () => {
+    //Retrieve User ID
+    useEffect(() => {
+        const getUserId = async () => {
+            try {
+                const storedUserId = await AsyncStorage.getItem('user_id');
+                if (storedUserId) {
+                    setUserId(storedUserId); 
+                } else {
+                    console.log("No user ID found");
+                }
+            } catch (error) {
+                console.error('Error retrieving user_id:', error);
+            }
+        };
+        getUserId(); 
+    }, []);
+
+    //To get current date for submitted survey date
+    const getCurrentDate = () => {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');  
+        const day = date.getDate().toString().padStart(2, '0'); 
+        return `${year}-${month}-${day}`;  
+    };
+
+    const handleSubmit = async () => {
         if (!agreed) {
             alert("You must agree to the consent form.");
             return;
@@ -119,16 +148,36 @@ const SurveyScreen = () => {
             return;
         }
 
-        // All validations passed, submit the data
+        const currentDate = getCurrentDate();
+
+        //If all validations passed, pass data
         const surveyData = {
-            consent: agreed,
+            userID: userId,
             satisfactionRating: selectedRating,
             feedbackType: selectedType,
-            feedbackResponse: response
+            feedbackResponse: response,
+            submittedDate: currentDate,
         };
 
         console.log("Survey submitted:", surveyData);
-        // Reset form after submission
+
+        try {
+            //Send data to the backend 
+            const response = await axios.post('http://localhost:5001/submitSurvey', surveyData);
+            
+            //Handle the response from the backend
+            if (response.status === 200) {
+                alert("Survey submitted successfully!");
+            } else {
+                alert("Error submitting survey.");
+            }
+        } catch (error) {
+            console.error("Error submitting survey:", error);
+            alert("There was an error submitting the survey. Please try again.");
+        }
+
+        
+        //Reset form after submission
         setAgreed(false);
         setSelectedRating(null);
         setResponse('');
@@ -161,7 +210,7 @@ const SurveyScreen = () => {
     );
 };
 
-const { width, height } = Dimensions.get('window');
+const width = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -169,13 +218,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#4682b4',
   },
 
   componentContainer:{
     borderWidth: 1,
     borderRadius: 5,
-    width: width*0.9,
+    width: width * 0.9,
     margin: 10,
     alignItems: 'center'
   },
@@ -241,7 +290,6 @@ const styles = StyleSheet.create({
     },
 
   //Satisfaction Rating Styles
-
   captionContainer:{
     flexDirection: 'row',
     justifyContent: 'space-between',
