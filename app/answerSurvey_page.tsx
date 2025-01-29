@@ -167,7 +167,7 @@ const SurveyScreen = () => {
             
             //Handle the response from the backend
             if (response.status === 200) {
-                alert("Survey submitted successfully!");
+                alert("Survey submitted successfully");
             } else {
                 alert("Error submitting survey.");
             }
@@ -210,7 +210,7 @@ const SurveyScreen = () => {
     );
 };
 
-const width = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -338,32 +338,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
 
-  checkboxContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 20,
-  },
-
-  checkbox: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: '#f9f9f9',
-  },
-
-  selectedCheckbox: {
-    backgroundColor: '#007BFF',
-    borderColor: '#007BFF',
-  },
-
-  checkboxText: {
-    fontSize: 16,
-    color: '#000',
-  },
+  
   
 
   title: {
@@ -396,18 +371,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
 
-  submitButton: {
-    backgroundColor: '#28a745',
-    padding: 15,
-    borderRadius: 5,
-    alignItems: 'center',
-  },
-
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
+  
 });
 
 export default SurveyScreen;

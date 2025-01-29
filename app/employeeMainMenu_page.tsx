@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
 
   selectedButton: {
-    backgroundColor: '#c3d4d3', // Background color when selected
+    backgroundColor: '#c3d4d3', //Background color when selected
   },
 
   profile: {

@@ -90,7 +90,7 @@ const kpiScreen = () => {
           }}
         />
         <Text style={styles.rateText}>Retention Rate: {calcRetentionRate().toFixed(2)}%</Text>
-        
+  
         {/* Admin Edit Section for Retention */}
         <View style={styles.editContainer}>
           <Text style={styles.editLabel}>Number of Employees at Beginning of Period:</Text>
@@ -101,6 +101,7 @@ const kpiScreen = () => {
             keyboardType="numeric"
           />
           <Text style={styles.editLabel}>Number of Employees at End of Period:</Text>
+
           <TextInput
             style={styles.input}
             value={numEmployeesEnd.toString()}
@@ -108,6 +109,7 @@ const kpiScreen = () => {
             keyboardType="numeric"
           />
           <Text style={styles.editLabel}>Number of Employees Left:</Text>
+          
           <TextInput
             style={styles.input}
             value={numEmployeesLeft.toString()}

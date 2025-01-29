@@ -87,10 +87,11 @@ app.post('/submitSurvey', (req, res) => {
 
   //SQL query to insert data into the database
   const query = 'INSERT INTO survey_responses(user_id, satisfaction_rating, written_type, written_response, submitted_at) VALUES (?, ?, ?, ?, ?)';
-  const values = [userID, feedbackResponse, feedbackType, satisfactionRating, submittedDate];
+  const values = [userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate];
 
   db.query(query, values, (err, result) => {
     if (err) {
+      console.error("Database error:", err);
       return res.status(500).send('Error saving survey data');
     }
     res.status(200).send('Survey data saved successfully');

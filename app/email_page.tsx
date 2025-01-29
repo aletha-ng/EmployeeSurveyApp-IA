@@ -18,7 +18,7 @@ const EmailScheduler = () => {
     const scheduledDate = `${date}-${month}-${year}`;
 
     try {
-        // Send the data to the backend using Axios
+        //Send the data to the backend using Axios
         const response = await axios.post('http://localhost:5001/sendEmail', {
           date: scheduledDate,
           content,
