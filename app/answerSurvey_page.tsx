@@ -168,6 +168,12 @@ const SurveyScreen = () => {
             //Handle the response from the backend
             if (response.status === 200) {
                 alert("Survey submitted successfully");
+                 //Reset form after submission
+                 setAgreed(false);
+                 setSelectedRating(null);
+                 setResponse('');
+                 setSelectedType(null);
+
             } else {
                 alert("Error submitting survey.");
             }
@@ -175,13 +181,7 @@ const SurveyScreen = () => {
             console.error("Error submitting survey:", error);
             alert("There was an error submitting the survey. Please try again.");
         }
-
-        
-        //Reset form after submission
-        setAgreed(false);
-        setSelectedRating(null);
-        setResponse('');
-        setSelectedType(null);
+    
     };
 
     return (

@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Button, Dimensions } from 'react-native';
 
 const UserProfile = () => {
-  const [user, setUser] = useState(null); // State to store user data
-  const [loading, setLoading] = useState(true); // State to manage loading state
+  const [user, setUser] = useState(null); //State to store user data
+  const [loading, setLoading] = useState(true); //State to manage loading state
   const [userId, setUserId] = useState(null);
 
    //Fetch User ID
@@ -22,24 +22,39 @@ const UserProfile = () => {
             console.error('Error retrieving user_id:', error);
         }
     };
+
     getUserId(); 
-}, []);
+  }, []);
 
   //Fetch user data 
   useEffect(() => {
-    const fetchUserData = async () => {
+    if (userId) { // Ensure userId is not null before making the request
+      const fetchUserData = async () => {
         try {
-            const response = await axios.get('http://your-backend-url/api/user', userId); 
-            const data = await response.json();
-            setUser(data); 
-            setLoading(false); 
+          console.log("Id submitted:", userId);
+          //const response = await axios.get('http://localhost:5001/api/user', userId);
+          const response = await axios.get('http://localhost:5001/api/user', {
+            params: { id: userId }
+          });
+  
+
+          const data = response.data;
+          setUser(data); 
+          setLoading(false); 
+  
         } catch (error) {
-            console.error('Error fetching user data:', error);
-            setLoading(false);
+          console.error('Error fetching user data:', error);
+          setLoading(false);
         }
-    };
-    fetchUserData();
-  }, []);
+      };
+  
+      fetchUserData();
+    } else {
+      console.log("No user ID to fetch data");
+      setLoading(false); // Stop loading if no userId
+    }
+  }, [userId]);
+  
 
   //Logging Out
   const handleLogout = async () => {

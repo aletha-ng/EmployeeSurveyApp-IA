@@ -85,9 +85,25 @@ app.post('/submitSurvey', (req, res) => {
   //take user id, ratings, feedback and put into the table. 
   const {userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate} = req.body;
 
+  //test delete ltr
+  console.log('Request received with data:', req.body);
+
+  // Check if all required fields are present
+  if (!userID || !satisfactionRating || !feedbackType || !feedbackResponse || !submittedDate) {
+    console.error('Missing required fields:', { userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate });
+    return res.status(400).send('Missing required fields');
+  }
+  //////////
+
   //SQL query to insert data into the database
   const query = 'INSERT INTO survey_responses(user_id, satisfaction_rating, written_type, written_response, submitted_at) VALUES (?, ?, ?, ?, ?)';
   const values = [userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate];
+
+
+  ///////////del ltr
+  console.log('Executing query:', query);
+  console.log('With values:', values);
+  /////
 
   db.query(query, values, (err, result) => {
     if (err) {
@@ -158,7 +174,11 @@ app.get('/api/feedbacks', (req, res) => {
 app.get('/api/user', (req, res) => {
   const userId = req.query.id;
 
-  const query = 'SELECT user_id, user_name, user_email, department FROM user_detail WHERE user_id = ?';
+  //del ltr
+  console.log('Received userId:', userId);
+  //////
+
+  const query = 'SELECT user_name, user_email, user_department FROM user_detail WHERE user_id=?';
 
   db.execute(query, [userId], (err, results) => {
     if (err) {
