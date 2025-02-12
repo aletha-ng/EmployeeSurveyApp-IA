@@ -41,6 +41,8 @@ const UserProfile = () => {
           const data = response.data;
           setUser(data); 
           setLoading(false); 
+
+          console.log(data);
   
         } catch (error) {
           console.error('Error fetching user data:', error);
@@ -86,14 +88,14 @@ const UserProfile = () => {
   return (
     <View style={styles.container}>
       {/* User Profile Image */}
-      <Image source={{uri: user.profileImage }} style={styles.profileImage} />
+      {/* <Image source={{uri: user.profileImage }} style={styles.profileImage} /> */}
 
       {/* User Details */}
       <View style={styles.detailsContainer}>
-        <Text style={styles.detailsText}>ID: {user.id}</Text>
-        <Text style={styles.detailsText}>Name: {user.name}</Text>
-        <Text style={styles.detailsText}>Email: {user.email}</Text>
-        <Text style={styles.detailsText}>Department: {user.department}</Text>
+        <Text style={styles.detailsText}>ID: {userId}</Text>
+        <Text style={styles.detailsText}>Name: {user.user_name}</Text>
+        <Text style={styles.detailsText}>Email: {user.user_email}</Text>
+        <Text style={styles.detailsText}>Department: {user.user_department}</Text>
       </View>
 
       {/* Logout Button */}
@@ -104,7 +106,7 @@ const UserProfile = () => {
   );
 };
 
-const width = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {

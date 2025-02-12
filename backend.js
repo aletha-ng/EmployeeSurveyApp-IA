@@ -178,15 +178,28 @@ app.get('/api/user', (req, res) => {
   console.log('Received userId:', userId);
   //////
 
+  if (!userId) {
+    console.error('Missing userId:', req.query);
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
   const query = 'SELECT user_name, user_email, user_department FROM user_detail WHERE user_id=?';
 
   db.execute(query, [userId], (err, results) => {
     if (err) {
       console.error('Error fetching user data:', err);
+      
+      //dell ltr
+      console.log('Failed to fetch:', userId);
+      ///
+
       return res.status(500).json({error: 'Failed to fetch user data'});
     }
 
     if (results.length > 0) {
+      //del ltr
+      console.log('success');
+      //////
       res.json(results[0]);
     } else {
       res.status(404).json({error: 'User not found'});
