@@ -2,8 +2,14 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, Button, Dimensions } from 'react-native';
+import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { CommonActions } from '@react-navigation/native';
+
 
 const UserProfile = () => {
+  const navigation = useNavigation();
+  const router = useRouter();
   const [user, setUser] = useState(null); //State to store user data
   const [loading, setLoading] = useState(true); //State to manage loading state
   const [userId, setUserId] = useState(null);
@@ -61,7 +67,13 @@ const UserProfile = () => {
   //Logging Out
   const handleLogout = async () => {
     try {
-        await AsyncStorage.removeItem('token');
+        await AsyncStorage.removeItem('user_id');
+        navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{name: 'index'}],
+                  })
+                );
         console.log('User logged out');
       
     } catch (error) {
