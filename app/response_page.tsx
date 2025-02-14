@@ -13,6 +13,7 @@ const surveyResponse = () => {
       try {
         //Get satisfaction rating
         const satisfactionResponse = await axios.get('http://localhost:5001/satisfaction-ratings');
+        
         setSatisfactionData(satisfactionResponse.data);
 
         //Get feedback data

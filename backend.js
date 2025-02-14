@@ -6,6 +6,7 @@ const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const app = express();
 const port = 5001;
+const cron = require('node-cron');
 
 app.use(cors());
 app.use(express.json());
@@ -25,6 +26,83 @@ db.connect(err => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+
+
+//TESTING AREA
+// const transporter = nodemailer.createTransport({
+//   service: 'Gmail',
+//   auth: { user: 'your-email@gmail.com', pass: 'your-password' },
+// });
+
+// app.post('/api/schedule-email', async (req, res) => {
+//   const { subject, content, scheduledTime } = req.body;
+//   try {
+//     await db.execute(
+//       'INSERT INTO email_schedules (subject, content, scheduled_time, status) VALUES (?, ?, ?, ?)',
+//       [subject, content, scheduledTime, 'pending']
+//     );
+//     res.status(201).send('Email scheduled');
+//   } catch (error) {
+//     res.status(500).send(error.message);
+//   }
+// });
+
+// cron.schedule('* * * * *', async () => {
+//   try {
+//     const [emails] = await db.execute(
+//       'SELECT * FROM email_schedules WHERE status = ? AND scheduled_time <= NOW()',
+//       ['pending']
+//     );
+
+//     for (const email of emails) {
+//       const [employees] = await db.execute('SELECT email FROM employees');
+//       const recipients = employees.map((e) => e.email);
+
+//       await transporter.sendMail({
+//         from: 'your-email@gmail.com',
+//         to: recipients.join(','),
+//         subject: email.subject,
+//         text: email.content,
+//       });
+
+//       await db.execute('UPDATE email_schedules SET status = ? WHERE id = ?', ['sent', email.id]);
+//     }
+//   } catch (error) {
+//     console.error('Cron job error:', error);
+//   }
+// });
+
+/////////////////////////////////////////////////
+
+//Get Count values of Satisfaction rating
+app.get('/satisfaction-distribution', (req, res) => {
+  const query = `
+    SELECT satisfaction_rating, COUNT(*) as count
+    FROM survey_responses
+    GROUP BY satisfaction_rating
+    ORDER BY satisfaction_rating
+  `;
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error('Error fetching satisfaction distribution:', error);
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    // Fill in missing ratings (e.g., if no one gave a "3")
+    const fullDistribution = [1, 2, 3, 4, 5].map((rating) => {
+      const found = results.find(
+        (row) => row.satisfaction_rating === rating
+      );
+      return { rating, count: found ? found.count : 0 };
+    });
+
+    res.json(fullDistribution);
+  });
+});
+
+
+
 
 //Login User - Checking details inputted by users 
 app.post('/login', (req, res) => {

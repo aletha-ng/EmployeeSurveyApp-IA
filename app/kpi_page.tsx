@@ -14,6 +14,14 @@ const kpiScreen = () => {
   const [retentionRate, setRetentionRate] = useState(0);
   const [turnoverRate, setTurnoverRate] = useState(0);
 
+  //ALSO MAYBE MODIFY THIS SO THE ADMIN CAN INPUT DATA PER YEAR OR QUARTER, ETC TO SHOW A GRAPH? 
+  //NECESSARY FORMULAS DELETE LATER
+  //(Number of employees at the end of a set time period / the number of employees at the start of a set time period) x 100 = retention rate percentage
+  //Turnover Rate = [(# of employee separations) / (average # of employees)] x 100
+
+  //Retention rate andn turover should be line chart 
+  //Satisfactionn should be bar chart 
+
   useEffect(() => {
     //Fetch retention rate data 
     axios.get('http://localhost:5001/api/retention-rate')
