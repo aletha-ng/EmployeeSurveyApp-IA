@@ -34,6 +34,9 @@ const EmployeeListScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text>Register New Employee?</Text>
+      <Text>Delete Employee?</Text>
+
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : error ? (

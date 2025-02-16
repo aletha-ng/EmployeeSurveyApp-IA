@@ -80,27 +80,32 @@ app.get('/satisfaction-distribution', (req, res) => {
     SELECT satisfaction_rating, COUNT(*) as count
     FROM survey_responses
     GROUP BY satisfaction_rating
-    ORDER BY satisfaction_rating
-  `;
+    ORDER BY satisfaction_rating`
+  ;
 
   db.query(query, (error, results) => {
-    if (error) {
+    if(error){
       console.error('Error fetching satisfaction distribution:', error);
-      return res.status(500).json({ error: 'Database error' });
+      return res.status(500).json({error: 'Database error'});
     }
 
-    // Fill in missing ratings (e.g., if no one gave a "3")
-    const fullDistribution = [1, 2, 3, 4, 5].map((rating) => {
-      const found = results.find(
-        (row) => row.satisfaction_rating === rating
-      );
-      return { rating, count: found ? found.count : 0 };
+    const rating_count = [0,0,0,0,0];
+    results.forEach((row) => {
+      const set_indexas_rating = row.satisfaction_rating-1; 
+      if(set_indexas_rating >= 0 && set_indexas_rating < 5){
+        rating_count[set_indexas_rating] += row.count;
+      }
     });
 
-    res.json(fullDistribution);
+    const rating_categories = rating_count.map((count, index) => ({
+      rating: index +1,
+      count: count,
+    }));
+
+    console.log(rating_categories);  
+    res.json(rating_categories); 
   });
 });
-
 
 
 
@@ -236,15 +241,15 @@ app.get('/api/satisfaction-ratings', (req, res) => {
 
 //Fetching Data for Feedbacks from Survey
 app.get('/api/feedbacks', (req, res) => {
-  const query = 'SELECT written_type, written_response FROM survey_responses';
+  const query = 'SELECT user_id, written_type, written_response FROM survey_responses';
 
-  db.query(query, (err, results) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-        return res.status(500).send('Error fetching data');
-      }
-    
-      res.json(results);
+  db.query(query, (err, results)=>{
+    if(err){
+      console.error('Error fetching data', err);
+      return res.status(500).send('Error fetching data');
+    }
+
+    res.json(results);
   });
 });
 

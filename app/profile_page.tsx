@@ -14,8 +14,8 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true); //State to manage loading state
   const [userId, setUserId] = useState(null);
 
-   //Fetch User ID
-   useEffect(() => {
+  //Fetch User ID
+  useEffect(() => {
     const getUserId = async () => {
         try {
             const storedUserId = await AsyncStorage.getItem('user_id');
@@ -33,6 +33,7 @@ const UserProfile = () => {
   }, []);
 
   //Fetch user data 
+  //MIGHT NEED CHANGE TO . FORM
   useEffect(() => {
     if (userId) { // Ensure userId is not null before making the request
       const fetchUserData = async () => {

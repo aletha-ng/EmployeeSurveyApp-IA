@@ -20,6 +20,12 @@ export default function SimpleDatePicker() {
   return (
     <View style={styles.container}>
       <Text>Select Date:</Text>
+      <View style={styles.selectionRow}>
+        <Text>Day</Text>
+        <Text>Month</Text>
+        <Text>Year</Text>
+      </View>
+      
 
       <View style={styles.selectionRow}>
         {/* Day Picker Trigger */}
@@ -56,7 +62,7 @@ export default function SimpleDatePicker() {
                 ))}
 
               {selectedSection === 'month' &&
-                Array.from({ length: 12 }, (_, i) => (
+                Array.from({length: 12}, (_, i) => (
                   <Picker.Item key={i} label={`${i + 1}`} value={`${i + 1}`} />
                 ))}
 
@@ -70,6 +76,26 @@ export default function SimpleDatePicker() {
           </View>
         </View>
       </Modal>
+
+      <View>
+        <Text>Email Title</Text>
+        <Text>Email Content</Text>
+      </View>
+
+      <View>
+        <TouchableOpacity>
+          <Text>Send Now</Text> 
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text>Sennd later</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text>Canncel</Text>
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 }
