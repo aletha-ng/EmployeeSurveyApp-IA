@@ -59,8 +59,8 @@ const SatisfactionRating = ({ selectedRating, setSelectedRating }) => {
 };
 
 //Written Feedback Question Component
-const WrittenFeedback = ({ response, setResponse, selectedType, setSelectedType }) => {
-    return (
+const WrittenFeedback = ({response, setResponse, selectedType, setSelectedType }) => {
+    return(
         <View style={styles.surveyContainer}>
             <Text style={styles.title}>Feedback responses</Text>
 
@@ -168,6 +168,7 @@ const SurveyScreen = () => {
             //Handle the response from the backend
             if (response.status === 200) {
                 alert("Survey submitted successfully");
+
                  //Reset form after submission
                  setAgreed(false);
                  setSelectedRating(null);

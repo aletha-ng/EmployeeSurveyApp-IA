@@ -1,44 +1,53 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import axios from 'axios';
 
-const EmailScheduleForm = () => {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [scheduledTime, setScheduledTime] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+const emailScheduler = () => {
+  const [showDatePicker, setShowDatePicker] = useState(true);
+
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendDate, setSendDate] = useState(new Date());
+
 
   const scheduleEmail = async () => {
+
+    //Formating the date received to MySQL format
+    const dateObject = new Date(sendDate);
+    const formattedDate = dateObject.toISOString().replace('T', ' ').slice(0, 19); 
+
+    const emailScheduleData = {
+      subject: emailSubject,            // title/subject of the email
+      body: emailBody,                  // body/content of the email
+      sendDate: formattedDate,          // scheduled send date of the email
+    };
+
+    console.log("Email schedule request:", emailScheduleData);
+
     try {
-      const response = await fetch('http://localhost:3000/api/schedule-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email_title: title,
-          email_content: content,
-          scheduled_time: scheduledTime.toISOString(), // Converting to ISO format
-        }),
-      });
+      // Send the schedule data to the backend
+      const response = await axios.post('http://localhost:5001/api/schedule-email', emailScheduleData);
 
-      if (!response.ok) {
-        throw new Error(`Failed to schedule email: ${await response.text()}`);
-      }
-
+      console.log("Email scheduled successfully", response.data);
       Alert.alert('Success', 'Email Scheduled Successfully!');
-      setTitle('');
-      setContent('');
-      setScheduledTime(new Date());
+
+      //setRecipientEmail('');
+      setEmailSubject('');
+      setEmailBody('');
+      setSendDate(new Date());
+
     } catch (error) {
-      Alert.alert('Error', error.message);
+      console.error("Error scheduling email", error);
+      Alert.alert('Error', 'Failed to schedule email');
     }
   };
 
+
   const onDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
+    setShowDatePicker(true);
     if (selectedDate) {
-      setScheduledTime(selectedDate);
+      setSendDate(selectedDate);
     }
   };
 
@@ -47,16 +56,16 @@ const EmailScheduleForm = () => {
       <Text style={styles.label}>Email Title:</Text>
       <TextInput
         style={styles.input}
-        value={title}
-        onChangeText={setTitle}
+        value={emailSubject}
+        onChangeText={setEmailSubject}
         placeholder="Enter email title"
       />
 
       <Text style={styles.label}>Email Content:</Text>
       <TextInput
         style={styles.input}
-        value={content}
-        onChangeText={setContent}
+        value={emailBody}
+        onChangeText={setEmailBody}
         placeholder="Enter email content"
         multiline
       />
@@ -65,7 +74,7 @@ const EmailScheduleForm = () => {
       <Button title="Select Date and Time" onPress={() => setShowDatePicker(true)} />
       {showDatePicker && (
         <DateTimePicker
-          value={scheduledTime}
+          value={sendDate}
           mode="datetime"
           is24Hour={true}
           display="default"
@@ -80,12 +89,16 @@ const EmailScheduleForm = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: '#4682b4'
   },
+
   label: {
     fontSize: 16,
     marginBottom: 5,
   },
+
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -95,7 +108,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmailScheduleForm;
+export default emailScheduler;
 
 
 ////////////////////////////////////////////////////////////////////////////////////

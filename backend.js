@@ -7,22 +7,28 @@ const nodemailer = require('nodemailer');
 const app = express();
 const port = 5001;
 const cron = require('node-cron');
-const { all } = require('axios');
+const {all} = require('axios');
+
+///for testign purpos imports 
+const fs = require('fs');
+
+
+
 
 app.use(cors());
 app.use(express.json());
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'AWQert#987',
   database: 'survey_database'
 });
 
-db.connect(err => {
-  if (err) throw err;
-  console.log('Database connected');
-});
+// db.connect(err => {
+//   if (err) throw err;
+//   console.log('Database connected');
+// });
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
@@ -36,88 +42,107 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-app.post('/api/schedule-email', async (req, res) => {
-  const{email_title, email_content, scheduled_time} = req.body;
-  try{
-    await db.execute('INSERT INTO email_schedules(subject, content, scheduled_time, status) VALUES(?,?,?,?)',
-      [email_title, email_content, scheduled_time, 'pending']
-    );
+
+app.post('/api/schedule-email', (req, res) => {
+  const {subject, body, sendDate} = req.body;
+
+  console.log('Received data:', req.body);
+  console.log(subject);
+  console.log(body);
+  console.log(sendDate);
+
+  // Check if all necessary data is present
+  if (!subject || !body || !sendDate) {
+    console.error("Missing required data: ", {subject, body, sendDate});
+    return res.status(400).send("Missing required data");
+  }
+
+  const query = 'INSERT INTO email_schedules(subject, content, scheduled_time, status) VALUES(?, ?, ?, ?)';
+  const values = [subject, body, sendDate, 'pending'];
+
+  db.query(query, values, (err, results) => {
+    if(err){
+      console.error('Error inserting email:', err);
+      return res.status(500).send('Error scheduling email');
+    }
+    console.log('Insert successful:', results);  // Log successful insert result
     res.status(200).send('Email Scheduled');
-  } catch(error){
-    res.status(500).send(error.message);
-  }
+  });
 });
 
-cron.schedule('* * * * *', async() =>{
-  try{
-    const[scheduled_emails] = await db.execute('SELECT * FROM email_schedules WHERE status =? AND scheduled_time <= NOW()',
-      ['pending']
-    );
 
-    for(const individual_email of scheduled_emails){
-      const[employees] = await db.execute('SELECT user_email FROM survey_responses')
-      const email_recipients = employees.map((employee_email_row) => employee_email_row.user_email);
 
-      await transporter.sendMail({
-        from: 'consultingfirmfeedbacknotify@gmail.com',
-        to: email_recipients.join(','),
-        subject: individual_email.subject,
-        text: individual_email.content,
+
+cron.schedule('* * * * *', () => {
+  const currentTime = new Date().toISOString();  // Get the current time
+  const logMessage = `Cron job executed at ${currentTime}\n`;
+  console.log(logMessage);
+
+  // Append the log message to a file
+  fs.appendFile('/Users/herisonng/Desktop/cronLog.txt', logMessage, (err) => {
+    if (err) {
+      console.error('Error writing to log file:', err);
+    } else {
+      console.log('Cron job execution logged.');
+    }
+  });
+
+  db.query(
+    'SELECT * FROM email_schedules WHERE status = ? AND scheduled_time <= NOW()',
+    ['pending'],
+    (err, scheduled_emails) => {
+      if (err) {
+        console.error('Error fetching scheduled emails:', err);
+        return;
+      }
+
+      scheduled_emails.forEach((individual_email) => {
+        db.query(
+          'SELECT user_email FROM user_detail WHERE user_role = ?',
+          ['employee'],
+          (err, employees) => {
+            if (err) {
+              console.error('Error fetching employee emails:', err);
+              return;
+            }
+
+            console.log('Employees found:', employees);
+
+
+            const email_recipients = employees.map((employee_email_row) => employee_email_row.user_email);
+            console.log('Email Recipients:', email_recipients);
+
+            transporter.sendMail(
+              {
+                from: 'consultingfirmfeedbacknotify@gmail.com',
+                to: email_recipients.join(','),
+                subject: individual_email.subject,
+                text: individual_email.content,
+              },
+              (error, info) => {
+                if (error) {
+                  console.error('Error sending email:', error);
+                } else {
+                  console.log('Email sent: ' + info.response);
+                }
+              }
+            );
+
+            db.query(
+              'UPDATE email_schedules SET status = ?, sent_time = NOW() WHERE id = ?',
+              ['sent', individual_email.id],
+              (err) => {
+                if (err) {
+                  console.error('Error updating email status:', err);
+                }
+              }
+            );
+          }
+        );
       });
-
-      await db.execute('UPDATE email_schedules SET status = ? WHERE id = ?', ['sent', email.id]);
-    } 
-  } catch (error){
-    console.log('cron error', error);
-  }
+    }
+  );
 });
-
-
-//TESTING AREA
-// const transporter = nodemailer.createTransport({
-//   service: 'Gmail',
-//   auth: { user: 'your-email@gmail.com', pass: 'your-password' },
-// });
-
-// app.post('/api/schedule-email', async (req, res) => {
-//   const { subject, content, scheduledTime } = req.body;
-//   try {
-//     await db.execute(
-//       'INSERT INTO email_schedules (subject, content, scheduled_time, status) VALUES (?, ?, ?, ?)',
-//       [subject, content, scheduledTime, 'pending']
-//     );
-//     res.status(201).send('Email scheduled');
-//   } catch (error) {
-//     res.status(500).send(error.message);
-//   }
-// });
-
-// cron.schedule('* * * * *', async () => {
-//   try {
-//     const [emails] = await db.execute(
-//       'SELECT * FROM email_schedules WHERE status = ? AND scheduled_time <= NOW()',
-//       ['pending']
-//     );
-
-//     for (const email of emails) {
-//       const [employees] = await db.execute('SELECT email FROM employees');
-//       const recipients = employees.map((e) => e.email);
-
-//       await transporter.sendMail({
-//         from: 'your-email@gmail.com',
-//         to: recipients.join(','),
-//         subject: email.subject,
-//         text: email.content,
-//       });
-
-//       await db.execute('UPDATE email_schedules SET status = ? WHERE id = ?', ['sent', email.id]);
-//     }
-//   } catch (error) {
-//     console.error('Cron job error:', error);
-//   }
-// });
-
-/////////////////////////////////////////////////
 
 //Get Count values of Satisfaction rating
 app.get('/satisfaction-distribution', (req, res) => {
@@ -151,8 +176,6 @@ app.get('/satisfaction-distribution', (req, res) => {
     res.json(rating_categories); 
   });
 });
-
-
 
 //Login User - Checking details inputted by users 
 app.post('/login', (req, res) => {
