@@ -1,7 +1,7 @@
 ///ADD STYLE SHEET
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { DataTable } from 'react-native-paper';
@@ -101,7 +101,25 @@ const SatisfactionBarChart = () => {
           yMax={maxY} // Custom max Y value based on data
         />
       </View>
-      
+
+      <View style={{flexDirection:'row'}}>
+        <View>
+          <Text>Filter Responses</Text>
+        </View>
+
+        <TouchableOpacity>
+          <Text>All</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text>Feedbacks Only</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity>
+          <Text>Complains only</Text>
+        </TouchableOpacity>
+      </View>
+  
       <View style={{padding:16}}>
         <DataTable>
             <DataTable.Header>

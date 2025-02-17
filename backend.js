@@ -7,6 +7,7 @@ const nodemailer = require('nodemailer');
 const app = express();
 const port = 5001;
 const cron = require('node-cron');
+const { all } = require('axios');
 
 app.use(cors());
 app.use(express.json());
@@ -25,6 +26,50 @@ db.connect(err => {
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth:{
+    user: 'consultingfirmfeedbacknotify@gmail.com',
+    pass: 'yysd xbsq pdum pixv'
+  },
+});
+
+app.post('/api/schedule-email', async (req, res) => {
+  const{email_title, email_content, scheduled_time} = req.body;
+  try{
+    await db.execute('INSERT INTO email_schedules(subject, content, scheduled_time, status) VALUES(?,?,?,?)',
+      [email_title, email_content, scheduled_time, 'pending']
+    );
+    res.status(200).send('Email Scheduled');
+  } catch(error){
+    res.status(500).send(error.message);
+  }
+});
+
+cron.schedule('* * * * *', async() =>{
+  try{
+    const[scheduled_emails] = await db.execute('SELECT * FROM email_schedules WHERE status =? AND scheduled_time <= NOW()',
+      ['pending']
+    );
+
+    for(const individual_email of scheduled_emails){
+      const[employees] = await db.execute('SELECT user_email FROM survey_responses')
+      const email_recipients = employees.map((employee_email_row) => employee_email_row.user_email);
+
+      await transporter.sendMail({
+        from: 'consultingfirmfeedbacknotify@gmail.com',
+        to: email_recipients.join(','),
+        subject: individual_email.subject,
+        text: individual_email.content,
+      });
+
+      await db.execute('UPDATE email_schedules SET status = ? WHERE id = ?', ['sent', email.id]);
+    } 
+  } catch (error){
+    console.log('cron error', error);
+  }
 });
 
 
