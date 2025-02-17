@@ -25,6 +25,7 @@ const app = () => {
 
       <View style = {styles.adminMenuButton}>
         <Button title='Profile' color='white' onPress={() => navigation.navigate('profile_page')}/>
+        <Button title='Profile' color='white' onPress={() => navigation.navigate('employeeNotifView_page')}/>
       </View>  
     </View>
   );

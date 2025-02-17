@@ -3,8 +3,9 @@ import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions} from 'react-native';
 
-//Consent Form Component
+//Consent form part 
 const ConsentForm = ({agreed, setAgreed}) => {
+
     const handleAgree = () => {
         setAgreed(!agreed);
     };
@@ -97,7 +98,7 @@ const WrittenFeedback = ({response, setResponse, selectedType, setSelectedType }
 };
 
 //Main Survey Screen
-const SurveyScreen = () => {
+const app = () => {
     const [agreed, setAgreed] = useState(false);
     const [selectedRating, setSelectedRating] = useState(null);
     const [response, setResponse] = useState('');
@@ -375,4 +376,4 @@ const styles = StyleSheet.create({
   
 });
 
-export default SurveyScreen;
+export default app;
