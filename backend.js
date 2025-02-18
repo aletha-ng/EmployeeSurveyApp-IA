@@ -12,9 +12,6 @@ const {all} = require('axios');
 ///for testign purpos imports 
 const fs = require('fs');
 
-
-
-
 app.use(cors());
 app.use(express.json());
 
@@ -233,7 +230,6 @@ app.get('/getEmpList', (req, res) => {
 
 //Submitting Survey
 app.post('/submitSurvey', (req, res) => {
-  //take user id, ratings, feedback and put into the table. 
   const {userID, satisfactionRating, feedbackType, feedbackResponse, submittedDate} = req.body;
 
   //test delete ltr

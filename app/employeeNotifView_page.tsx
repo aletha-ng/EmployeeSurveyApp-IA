@@ -1,94 +1,95 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Alert} from 'react-native';
 
 const app = () => {
-    const [consentFormAgreement, setConsentFormAgreement] = useState(false);
-    const [satisfactionRating, setSatisfactionRating] = useState(null);
-    const [writtenResponse, setWrittenResponse] = useState('');
-    const [writtenResponseType, setWrittenResponseType] = useState(null);
+    const [agreement, setAgreement] = useState(false);
+    const [satRating, setSatRating] = useState(null);
+    const [response, setresponse] = useState('');
+    const [responseType, setresponseType] = useState(null);
     const [userId, setUserId] = useState(null);
 
-    //get user id
     useEffect(() => {
-        AsyncStorage.getItem('user_id').then((retrievedID) => {
-            console.log("Retrieved User ID:", retrievedID);
+        const getUserId = async () => {
+            let retrievedID = await AsyncStorage.getItem('user_id');
             setUserId(retrievedID);
-        });
+        };
+        getUserId();
     }, []);
 
-    //get current date for survey submitted at
-    const getCurrentDate = () => {
-        const date = new Date();
-        return date.toISOString().split('T')[0]; // Formats as YYYY-MM-DD
-    };
-
     const submitSurvey = async () => {
-        if (!consentFormAgreement || satisfactionRating === null || !writtenResponseType || !writtenResponse.trim()) {
-            alert("Please complete all required fields before submitting.");
+        if(!agreement || satRating == null || responseType == null || response.trim() === ''){
+            Alert.alert("Please answer all required fields before submitting.");
             return;
         }
 
         const userResponse = {
             userID: userId,
-            satisfactionRating: satisfactionRating,
-            feedbackType: writtenResponseType,
-            feedbackResponse: writtenResponse,
-            submittedDate: getCurrentDate(),
+            satisfactionRating: satRating,
+            feedbackType: responseType,
+            feedbackResponse: response,
+            submittedDate: new Date().toISOString().split('T')[0],
         };
 
-        console.log("Survey submitted:", userResponse);
+        try{
+            await axios.post('http://localhost:5001/submitSurvey', userResponse);
+            Alert.alert("Survey submitted successfully");
 
-        try {
-            const res = await axios.post('http://localhost:5001/submitSurvey', userResponse);
-            if (res.status === 200) {
-                alert("Survey submitted successfully");
-                setConsentFormAgreement(false);
-                setSatisfactionRating(null);
-                setWrittenResponse('');
-                setWrittenResponseType(null);
-            } else {
-                alert("Error submitting survey.");
-            }
-        } catch (error) {
-            console.error("Error submitting survey:", error);
-            alert("There was an error in submitting the survey. Please try again.");
+            //Clear survey form
+            setAgreement(false);
+            setSatRating(null);
+            setresponse('');
+            setresponseType(null);
+
+        }catch (error){
+            console.error(error);
+            Alert.alert("Unable to submit survey, there was an error. Please try again.");
         }
+    };
+
+    const deleteSurvey = async ()=> {
+        Alert.alert('Do you want to delete all responses?', 'Delete all responnses?',
+            [{text: 'cancel', style: 'cancel',},
+            {text: 'confirm',
+            onPress: () => {
+                setAgreement(false);
+                setSatRating(null);
+                setresponse('');
+                setresponseType(null);
+            }}
+            ],
+        );
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {/* Consent Form */}
+            {/*Consent Form */}
             <View style={styles.componentContainer}>
                 <Text style={styles.title}>Consent Disclaimer</Text>
                 <View style={styles.consentTextContainer}>
                     <Text style={styles.consentText}>
                         By proceeding, you agree to participate in the survey under the following terms and conditions:
-                        Your writtenResponses will be used to improve our services and may be shared in anonymized reports. You
+                        Your responses will be used to improve our services and may be shared in anonymized reports. You
                         can withdraw your participation at any time.
                     </Text>
                 </View>
-                <TouchableOpacity
-                    style={[styles.checkbox, consentFormAgreement && styles.selectedCheckbox]}
-                    onPress={() => setConsentFormAgreement(!consentFormAgreement)}
-                >
-                    <Text style={styles.checkboxText}>I agree</Text>
+                <TouchableOpacity style={[styles.btn, agreement && styles.selectedBtn]}
+                    onPress={() => setAgreement(!agreement)}>
+                    <Text style={styles.btnText}>I agree</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Satisfaction Rating */}
+            {/*Satisfaction satRating */}
             <View style={styles.componentContainer}>
-                <Text style={styles.title}>Satisfaction Rating</Text>
+                <Text style={styles.title}>Satisfaction satRating</Text>
                 <Text>On a scale of 1-5, how satisfied are you working in this company?</Text>
                 <View style={styles.satisfactionChoice}>
                     {[1, 2, 3, 4, 5].map((rating) => (
-                        <TouchableOpacity
-                            key={rating}
-                            style={[styles.ratingButton, satisfactionRating === rating && styles.selectedButton]}
-                            onPress={() => setSatisfactionRating(rating)}
-                        >
-                            <Text style={styles.ratingText}>{rating}</Text>
+                        <TouchableOpacity key={rating} 
+                        style={[styles.satRatingButton, rating === satRating && styles.selectedButton]} 
+                        onPress={() => setSatRating(rating)}>
+                            <Text>{rating}</Text>
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -99,37 +100,38 @@ const app = () => {
                 </View>
             </View>
 
-            {/* Written Feedback */}
+            {/*Written Feedback */}
             <View style={styles.componentContainer}>
-                <Text style={styles.title}>Feedback writtenResponses</Text>
-                <View style={styles.checkboxContainer}>
-                    <TouchableOpacity
-                        style={[styles.checkbox, writtenResponseType === 'feedback' && styles.selectedCheckbox]}
-                        onPress={() => setWrittenResponseType('feedback')}
-                    >
-                        <Text style={styles.checkboxText}>Feedback</Text>
+                <Text style={styles.title}>Feedback responses</Text>
+                <View style={styles.typeSelection}>
+                    <TouchableOpacity style={[styles.btn, responseType === 'feedback' && styles.selectedBtn]} onPress={() => setresponseType('feedback')}>
+                        <Text style={styles.btnText}>Feedback</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity
-                        style={[styles.checkbox, writtenResponseType === 'Complaints' && styles.selectedCheckbox]}
-                        onPress={() => setWrittenResponseType('Complaints')}
-                    >
-                        <Text style={styles.checkboxText}>Complaints</Text>
+                    <TouchableOpacity style={[styles.btn, responseType === 'Complaints' && styles.selectedBtn]} onPress={() => setresponseType('Complaints')}>
+                        <Text style={styles.btnText}>Complaints</Text>
                     </TouchableOpacity>
                 </View>
 
                 <TextInput
                     style={styles.input}
-                    placeholder="Write your writtenResponses here..."
-                    value={writtenResponse}
-                    onChangeText={setWrittenResponse}
+                    placeholder="Write responses here..."
+                    value={response}
+                    onChangeText={setresponse}
                 />
             </View>
 
-            {/* Submit Button */}
-            <TouchableOpacity style={styles.submitButton} onPress={submitSurvey}>
-                <Text style={styles.submitButtonText}>Submit Survey</Text>
-            </TouchableOpacity>
+            <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+                {/*Submit*/}
+                <TouchableOpacity style={styles.submitButton} onPress={submitSurvey}>
+                    <Text style={styles.submitDelBtnText}>Submit Survey</Text>
+                </TouchableOpacity>
+
+                {/*Delete response*/}
+                <TouchableOpacity style={styles.deleteButton} onPress={deleteSurvey}>
+                    <Text style={styles.submitDelBtnText}>Delete all response</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 };
@@ -148,7 +150,7 @@ const styles = StyleSheet.create({
     componentContainer: {
         borderWidth: 1,
         borderRadius: 5,
-        width: width * 0.9,
+        width: width*0.9,
         margin: 10,
         alignItems: 'center',
         padding: 15,
@@ -175,55 +177,61 @@ const styles = StyleSheet.create({
         textAlign: 'center',
     },
 
-    checkbox: {
+    btn: {
+        padding: 10,
         borderWidth: 1,
-        borderColor: '#ccc',
+        margin: 10,
         borderRadius: 5,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
+        borderColor: 'black',
         backgroundColor: '#f9f9f9',
     },
 
-    selectedCheckbox: {
+    selectedBtn: {
         backgroundColor: '#007BFF',
         borderColor: '#007BFF',
     },
 
-    checkboxText: {
+    btnText: {
         fontSize: 16,
         color: '#000',
     },
 
-    satisfactionChoice: {
+    typeSelection:{
         flexDirection: 'row',
+    },
+
+    satisfactionChoice: {
         justifyContent: 'center',
+        flexDirection: 'row',
         marginVertical: 10,
     },
 
-    ratingButton: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    satRatingButton: {
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#ddd',
+        backgroundColor: 'white',
+        width: 50,
+        height: 50,
         marginHorizontal: 5,
+        borderRadius: 25,
+        borderColor: 'black',
     },
 
     selectedButton: {
         backgroundColor: '#007BFF',
+        borderColor: 'black',
     },
 
     captionContainer: {
+        width: width * 0.65,
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginTop: 5,
-        width: width * 0.65,
     },
 
     caption: {
         fontSize: 14,
-        color: '#000',
+        color: 'black',
     },
 
     input: {
@@ -241,12 +249,22 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         alignItems: 'center',
         marginTop: 20,
+        marginRight: 20,
     },
 
-    submitButtonText: {
+    submitDelBtnText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+
+    deleteButton: {
+        backgroundColor: '#db624f',
+        padding: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 20,
+        marginLeft: 20,
     },
 });
 
