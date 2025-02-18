@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Text, View, StyleSheet, Button, Alert, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
 import { useNavigation } from 'expo-router';
-import axios from 'axios'; 
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width, height } = Dimensions.get('window');
 
@@ -13,51 +13,39 @@ const App = () => {
 
   const login = async () => {
     try {
-
       //Request to backend to check user's details
       const response = await axios.post('http://localhost:5001/login', {
         email: email,
         password: password
       });
-  
-      //If details of user are correct 
-      if (response.status === 200) {
-        const {user_role, user_id} = response.data;
-      
-        console.log('User role:', user_role);
-        console.log('Login successful', response.data);
 
-        //Save user_id in AsyncStorage
-        await AsyncStorage.setItem('user_id', user_id.toString()); 
 
-        //Setting the routes of main menu page according to user role passed back 
-        let route = '';
-        if(user_role == 'admin'){
-          route = 'adminMainMenu_page';
-        }
-        else if(user_role == 'employee'){
-          route = 'employeeMainMenu_page';
-        }        
-              
-        //Resets navigation states to not allow user return to login page 
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{name: route}],
-          })
-        );
+      const { user_role, user_id } = response.data;
+      //Save user_id in AsyncStorage for use during user session
+      await AsyncStorage.setItem('user_id', user_id.toString());
+
+      let route = '';
+      if (user_role == 'admin') {
+        route = 'adminMainMenu_page';
       }
-    } 
-    
-    catch (error) {
-      if (error.response?.status === 404 || error.response?.status === 400) {
-        Alert.alert('Unable to Login', 'Invalid email or password.', [{ text: 'OK' }]);
-      } else {
-        console.error('Login error:', error);
-      }  
+      else if (user_role == 'employee') {
+        route = 'employeeMainMenu_page';
+      }
+
+      //Resets navigation states to not allow user return to login page 
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: route }],
+        })
+      );
+
+    } catch (error) {
+      Alert.alert('Unable to Login', 'Invalid email or password, please try again', [{ text: 'OK' }]);
+      console.log(error);
     }
   };
-  
+
 
   return (
     <View style={styles.mainContainer}>
@@ -96,7 +84,7 @@ const App = () => {
             onPress={login}
           />
         </View>
-        
+
       </View>
     </View>
   );

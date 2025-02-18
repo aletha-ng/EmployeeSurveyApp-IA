@@ -10,7 +10,7 @@ const EmployeeListScreen = () => {
   useEffect(() => {
     //Fetch employee list from the backend API
     axios
-      .get('http://localhost:5001/getEmpList') 
+      .get('http://localhost:5001/getEmpList')
       .then((response) => {
         setEmployees(response.data.employees);
         setLoading(false);
@@ -22,7 +22,7 @@ const EmployeeListScreen = () => {
   }, []);
 
   // Render employee data
-  const renderItem = ({item}) => (
+  const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.itemText}>ID: {item.user_id}</Text>
       <Text style={styles.itemText}>Name: {item.user_name}</Text>
@@ -34,9 +34,6 @@ const EmployeeListScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Register New Employee?</Text>
-      <Text>Delete Employee?</Text>
-
       {loading ? (
         <ActivityIndicator size="large" color="#0000ff" />
       ) : error ? (
@@ -45,7 +42,7 @@ const EmployeeListScreen = () => {
         <FlatList
           data={employees}
           renderItem={renderItem}
-          keyExtractor={(item) => item.user_id.toString()} 
+          keyExtractor={(item) => item.user_id.toString()}
         />
       )}
     </View>

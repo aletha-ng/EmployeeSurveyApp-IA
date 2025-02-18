@@ -1,42 +1,39 @@
 import React from 'react';
-import {View, StyleSheet, Dimensions, Button,} from 'react-native';
-import {useNavigation} from 'expo-router';
+import { View, StyleSheet, Dimensions, Button, } from 'react-native';
+import { useNavigation } from 'expo-router';
 
 //Universal Constants
 const { width, height } = Dimensions.get('window');
-const DEFAULT_PADDING = 10; 
-const DEFAULT_MARGIN = 10;
-
 
 const app = () => {
   const navigation = useNavigation();
-  
+
   const handlePress = (route: string) => {
     navigation.navigate(route);
   };
-  
-    //Layout 
-    return (
-      <View style = {styles.mainContainer}>
-        <View style = {styles.adminMenuButton}>
-            <Button
-            title='Submit A Survey'
-            color='white'
-            onPress={() => handlePress('answerSurvey_page')}
-            />
-        </View>
 
-        <View style = {styles.adminMenuButton}>
-            <Button
-            title='Profile'
-            color='white'
-            onPress={() => handlePress('profile_page')}
-            />
-        </View>
+  //Layout 
+  return (
+    <View style={styles.mainContainer}>
+      <View style={styles.adminMenuButton}>
+        <Button
+          title='Submit A Survey'
+          color='white'
+          onPress={() => handlePress('answerSurvey_page')}
+        />
       </View>
-    );
-  };
-  
+
+      <View style={styles.adminMenuButton}>
+        <Button
+          title='Profile'
+          color='white'
+          onPress={() => handlePress('profile_page')}
+        />
+      </View>
+    </View>
+  );
+};
+
 export default app;
 
 
@@ -52,7 +49,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'flex-end',
-    padding: DEFAULT_PADDING,
+    padding: 10,
     borderWidth: 1,
   },
 
@@ -60,7 +57,7 @@ const styles = StyleSheet.create({
   //Text Styles
   heading: {
     alignItems: 'center',
-    padding: DEFAULT_PADDING,
+    padding: 10,
     fontFamily: 'arial',
     fontWeight: 'bold',
     fontSize: 30,
@@ -80,7 +77,7 @@ const styles = StyleSheet.create({
   //Component Styles
   input: {
     height: height * 0.05,
-    width: width*0.8,
+    width: width * 0.8,
     justifyContent: 'center',
     margin: 10,
     borderWidth: 1,
@@ -91,8 +88,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     justifyContent: 'center',
-    width: width*0.4,
-    height: height*0.05,
+    width: width * 0.4,
+    height: height * 0.05,
   },
 
   longButton: {
@@ -101,11 +98,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     width: width * 0.6,
     height: height * 0.05,
-    margin: DEFAULT_MARGIN,
+    margin: 10,
   },
 
   selectedButton: {
-    backgroundColor: '#c3d4d3', //Background color when selected
+    backgroundColor: '#c3d4d3',
   },
 
   profile: {
@@ -114,7 +111,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 
-  pressableBox:{
+  pressableBox: {
     width: width * 0.9,
     height: height * 0.1,
     backgroundColor: 'grey',
@@ -123,23 +120,23 @@ const styles = StyleSheet.create({
   surveyConsentTitle: {
     width: width * 0.9,
     height: height * 0.1,
-    margin: DEFAULT_MARGIN,
-    padding: DEFAULT_PADDING,
+    margin: 10,
+    padding: 10,
     borderWidth: 1,
   },
 
   surveyConsentText: {
     width: width * 0.9,
-    margin: DEFAULT_MARGIN,
-    padding: DEFAULT_PADDING,
+    margin: 10,
+    padding: 10,
     borderWidth: 1,
   },
 
-  adminMenuButton:{
-    margin: DEFAULT_MARGIN,
-    padding: DEFAULT_PADDING,
+  adminMenuButton: {
+    margin: 10,
+    padding: 10,
     borderWidth: 1,
     width: width * 0.8,
-    fontSize: 15, 
+    fontSize: 15,
   },
 });

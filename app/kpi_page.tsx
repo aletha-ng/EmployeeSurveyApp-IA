@@ -1,457 +1,314 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import { Dimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Dimensions } from 'react-native';
 import axios from 'axios';
+import { LineChart } from 'react-native-chart-kit';
 
-const KpiScreen = () => {
-  const [retentionData, setRetentionData] = useState([]);
-  const [turnoverData, setTurnoverData] = useState([]);
+const { width, height } = Dimensions.get('window');
 
-  const [modalVisible, setModalVisible] = useState(false);
-  const [date, setDate] = useState('');
-  const [numEmployeesBegin, setNumEmployeesBegin] = useState('');
-  const [numEmployeesEnd, setNumEmployeesEnd] = useState('');
-  const [numEmployeesLeft, setNumEmployeesLeft] = useState('');
+const app = () => {
+  const [startEmployees, setStartEmployees] = useState('');
+  const [endEmployees, setEndEmployees] = useState('');
+  const [selectedQuarter, setSelectedQuarter] = useState(null);
+  const [kpiData, setKpiData] = useState([]);
+  const [x, setX] = useState([]);
+  const [pointsRetention, setPointsRetention] = useState([]);
+  const [pointsTurnover, setPointsTurnover] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [lastR, setLastR] = useState('');
+  const [lastT, setLastT] = useState('');
 
-  useEffect(() => {
-    // Fetch data on initial load
-    axios.get('http://localhost:5001/api/retention-rate')
-      .then(response => {
-        const data = response.data.map((entry) => ({
-          date: entry.period || 'Period 1', // Assuming API has a 'period' field
-          numEmployeesBegin: entry.employee_at_start,
-          numEmployeesEnd: entry.employee_at_end,
-          numEmployeesLeft: entry.employee_left_company || 0,
-        }));
-        setRetentionData(data);
-        setTurnoverData(data);
-      })
-      .catch(error => console.error('Error fetching data:', error));
-  }, []);
-
-  const handleAddData = () => {
-    if (!date || !numEmployeesBegin || !numEmployeesEnd || !numEmployeesLeft) {
-      alert('Please fill in all fields');
+  const saveKpi = async () => {
+    if (startEmployees.trim() == '' || endEmployees.trim() == '' || selectedQuarter == null) {
+      Alert.alert("Please fill in all data.");
       return;
     }
 
-    const newEntry = {
-      date,
-      numEmployeesBegin: parseInt(numEmployeesBegin),
-      numEmployeesEnd: parseInt(numEmployeesEnd),
-      numEmployeesLeft: parseInt(numEmployeesLeft),
+    let quarterVal = 0;
+    if (selectedQuarter === 'Q1') {
+      quarterVal = 1;
+    }
+    if (selectedQuarter === 'Q2') {
+      quarterVal = 2;
+    }
+    if (selectedQuarter === 'Q3') {
+      quarterVal = 3;
+    }
+    if (selectedQuarter === 'Q4') {
+      quarterVal = 4;
+    }
+
+    const kpiToSend = {
+      quarter_month: quarterVal,
+      num_employees_start: startEmployees,
+      num_employees_end: endEmployees,
+      submittedDate: new Date().toISOString().split('T')[0],
     };
 
-    setRetentionData((prev) => [...prev, newEntry]);
-    setTurnoverData((prev) => [...prev, newEntry]);
+    try {
+      await axios.post('http://localhost:5001/insert-new-kpi', kpiToSend);
 
-    // Clear the input fields and close the modal
-    setDate('');
-    setNumEmployeesBegin('');
-    setNumEmployeesEnd('');
-    setNumEmployeesLeft('');
-    setModalVisible(false);
+      Alert.alert('KPI data saved');
+      setStartEmployees('');
+      setEndEmployees('');
+      setSelectedQuarter(null);
+
+    } catch (error) {
+      Alert.alert('Unable to save kpi data, please try again');
+    }
   };
 
-  const retentionGraphData = {
-    labels: retentionData.map((entry) => entry.date),
-    datasets: [
-      {
-        data: retentionData.map((entry) =>
-          ((entry.numEmployeesEnd - entry.numEmployeesLeft) / entry.numEmployeesBegin) * 100
-        ),
-      },
-    ],
+  const fetchKpiData = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/get-kpi-data');
+      setKpiData(response.data.results);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
-  const turnoverGraphData = {
-    labels: turnoverData.map((entry) => entry.date),
-    datasets: [
-      {
-        data: turnoverData.map((entry) =>
-          (entry.numEmployeesLeft / entry.numEmployeesBegin) * 100
-        ),
-      },
-    ],
+  useEffect(() => {
+    fetchKpiData();
+  }, []);
+
+  useEffect(() => {
+    let retentionR = [];
+    let turnoverR = [];
+    let xAxis = [];
+
+    kpiData.forEach(data => {
+      retentionR.push(Number(data.retention_rate));
+      turnoverR.push(Number(data.turnover_rate));
+      xAxis.push(data.quarter_month);
+    });
+
+    setPointsRetention(retentionR);
+    setPointsTurnover(turnoverR);
+    setX(xAxis);
+
+    setLastR(retentionR[retentionR.length - 1]);
+    setLastT(turnoverR[retentionR.length - 1]);
+
+
+
+  }, [kpiData]); //Fill new data whenever kpiData is updated
+
+  const reloadChart = async () => {
+    setLoading(true);
+    fetchKpiData();
   };
+
+
+  if (loading == true) {
+    return (
+      //Avoiding to load any charts with initialised values before fetching 
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.title}>Retention Rate Over Time</Text>
-        <LineChart
-          data={retentionGraphData}
-          width={Dimensions.get('window').width - 40}
-          height={220}
-          yAxisSuffix="%"
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>KPI Dashboard</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder='Insert Number of Employees at start of time period'
+        placeholderTextColor='#adb2b3'
+        keyboardType='numeric'
+        value={startEmployees}
+        onChangeText={setStartEmployees}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder='Insert Number of Employees at end of time period'
+        placeholderTextColor='#adb2b3'
+        keyboardType='numeric'
+        value={endEmployees}
+        onChangeText={setEndEmployees}
+      />
+
+      <View style={styles.quarterGroup}>
+        <Text style={styles.subTitle}>Select Quarter</Text>
+        <View style={styles.buttonGroup}>
+          {['Q1', 'Q2', 'Q3', 'Q4'].map((quarter) => (
+            <TouchableOpacity
+              key={quarter}
+              style={[
+                styles.button,
+                selectedQuarter === quarter && styles.selectedButton,
+              ]}
+              onPress={() => setSelectedQuarter(quarter)}
+            >
+              <Text style={[styles.buttonText, selectedQuarter === quarter && styles.selectedButtonText,]}>
+                {quarter}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.title}>Turnover Rate Over Time</Text>
-        <LineChart
-          data={turnoverGraphData}
-          width={Dimensions.get('window').width - 40}
-          height={220}
-          yAxisSuffix="%"
-          chartConfig={chartConfig}
-          style={styles.chart}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-        <Text style={styles.addButtonText}>Add Data</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={saveKpi}>
+        <Text style={styles.submitButtonText}>Submit Data</Text>
       </TouchableOpacity>
 
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add New Data</Text>
+      <TouchableOpacity style={styles.reloadBtn} onPress={fetchKpiData}>
+        <Text style={styles.submitButtonText}>Reload New Chart</Text>
+      </TouchableOpacity>
 
-            <TextInput
-              style={styles.input}
-              placeholder="Date (e.g., Q1 2024)"
-              value={date}
-              onChangeText={setDate}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Number of Employees at Start"
-              keyboardType="numeric"
-              value={numEmployeesBegin}
-              onChangeText={setNumEmployeesBegin}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Number of Employees at End"
-              keyboardType="numeric"
-              value={numEmployeesEnd}
-              onChangeText={setNumEmployeesEnd}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Number of Employees Left"
-              keyboardType="numeric"
-              value={numEmployeesLeft}
-              onChangeText={setNumEmployeesLeft}
-            />
-
-            <TouchableOpacity style={styles.submitButton} onPress={handleAddData}>
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={styles.chartNTitleGroup}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.chartTitle}>Latest Retention Rate</Text>
+          <Text style={styles.chartTitle}>{lastR}%</Text>
         </View>
-      </Modal>
+        <LineChart
+          data={{
+            labels: x,
+            datasets: [{ data: pointsRetention, },],
+          }}
+
+          width={width - 40}
+          height={height * 0.5}
+
+          chartConfig={{
+            backgroundGradientFrom: 'white',
+            backgroundGradientTo: 'white',
+            decimalPlaces: 1,
+            color: (opacity = 1) => `blue`,
+          }}
+          yAxisSuffix="%"
+        />
+      </View>
+
+
+      <View style={styles.chartNTitleGroup}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.chartTitle}>Latest Turnover Rate</Text>
+          <Text style={styles.chartTitle}>{lastT}%</Text>
+        </View>
+        <LineChart
+          data={{
+            labels: x,
+            datasets: [{ data: pointsTurnover, },],
+          }}
+          width={width - 40}
+          height={height * 0.5}
+          chartConfig={{
+            backgroundGradientFrom: 'white',
+            backgroundGradientTo: 'white',
+            decimalPlaces: 1,
+            color: (opacity = 1) => `blue`,
+          }}
+          yAxisSuffix="%"
+        />
+      </View>
+
+
     </ScrollView>
   );
 };
 
-const chartConfig = {
-  backgroundColor: '#ffffff',
-  backgroundGradientFrom: '#ffffff',
-  backgroundGradientTo: '#ffffff',
-  decimalPlaces: 2,
-  color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-  labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-  style: { borderRadius: 16 },
-};
+
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
-    backgroundColor: '#f0f4f8',
-  },
-  section: {
-    marginBottom: 20,
+    backgroundColor: '#4682b4',
   },
   title: {
-    fontSize: 18,
+    fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 16,
-  },
-  addButton: {
-    backgroundColor: '#007AFF',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    marginHorizontal: 30,
-    borderRadius: 12,
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
   },
   input: {
+    height: 40,
+    borderColor: 'white',
     borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
+    marginBottom: 15,
+    width: '100%',
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  subTitle: {
+    fontSize: 18,
+    fontWeight: '500',
+    marginTop: 20,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    margin: 20,
+  },
+  button: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    backgroundColor: '#ddd',
+    margin: 5,
+    borderColor: 'white',
+    borderWidth: 1,
+  },
+  selectedButton: {
+    backgroundColor: '#007BFF',
+    borderWidth: 1,
+
+  },
+  buttonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  selectedButtonText: {
+    color: 'black',
+  },
+  message: {
+    color: 'red',
     marginBottom: 10,
-    borderRadius: 8,
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8ab1b5',
     padding: 10,
-    borderRadius: 8,
+    width: '100%',
+    borderRadius: 5,
+    marginBottom: 20,
     alignItems: 'center',
-    marginVertical: 5,
   },
   submitButtonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
   },
-  cancelButton: {
-    marginTop: 5,
+  reloadBtn: {
+    backgroundColor: '#8ab1b5',
+    padding: 10,
+    width: '100%',
+    borderRadius: 5,
+    marginBottom: 20,
     alignItems: 'center',
   },
-  cancelButtonText: {
-    color: '#007AFF',
+
+  chartTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 10,
+    marginHorizontal: 20,
+  },
+  quarterGroup: {
+    alignItems: 'center',
+    width: '100%',
+    borderColor: 'white',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  chartNTitleGroup: {
+    borderWidth: 1,
+    borderColor: 'white',
+    margin: 10,
+    alignItems: 'center',
+    borderRadius: 5,
   },
 });
 
-export default KpiScreen;
-
-
-
-
-// import React, {useState, useEffect} from 'react';
-// import {View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView} from 'react-native';
-// import {LineChart} from 'react-native-chart-kit';
-// import {Dimensions} from 'react-native';
-// import axios from 'axios'; 
-
-// const kpiScreen = () => {
-//   const [numEmployeesBegin, setNumEmployeesBegin] = useState(0);
-//   const [numEmployeesEnd, setNumEmployeesEnd] = useState(0);
-//   const [numEmployeesLeft, setNumEmployeesLeft] = useState(0);
-//   const [numEmployeesStayed, setNumEmployeesStayed] = useState(0);
-
-//   //State to store retention and turnover rates
-//   const [retentionRate, setRetentionRate] = useState(0);
-//   const [turnoverRate, setTurnoverRate] = useState(0);
-
-//   //ALSO MAYBE MODIFY THIS SO THE ADMIN CAN INPUT DATA PER YEAR OR QUARTER, ETC TO SHOW A GRAPH? 
-//   //NECESSARY FORMULAS DELETE LATER
-//   //(Number of employees at the end of a set time period / the number of employees at the start of a set time period) x 100 = retention rate percentage
-//   //Turnover Rate = [(# of employee separations) / (average # of employees)] x 100
-
-//   //Retention rate andn turover should be line chart 
-//   //Satisfactionn should be bar chart 
-
-//   useEffect(() => {
-//     //Fetch retention rate data 
-//     axios.get('http://localhost:5001/api/retention-rate')
-//       .then((response) => {
-//         const data = response.data[0]; 
-//         setNumEmployeesBegin(data.employee_at_start);
-//         setNumEmployeesEnd(data.employee_at_end);
-//       })
-//       .catch((error) => {
-//         console.error('Error fetching retention rate data:', error);
-//       });
-
-    
-//     //Fetch turnover rate data 
-//     axios.get('http://localhost:5001/api/turnover-rate')
-//       .then((response) => {
-//         const data = response.data[0]; 
-//         setNumEmployeesLeft(data.employee_left_company);
-//         setNumEmployeesStayed(data.employee_stayed_company);
-//       })
-//       .catch((error) => {
-//         console.error('Error fetching turnover rate data:', error);
-//       });
-//   }, []); 
-
-//   //Calculate Retention Rate
-//   const calcRetentionRate = () => {
-//     return ((numEmployeesEnd - numEmployeesLeft) / numEmployeesBegin) * 100;
-//   };
-
-//   //Calculate Turnover Rate
-//   const calcTurnoverRate = () => {
-//     return (numEmployeesLeft / numEmployeesBegin) * 100;
-//   };
-
-//   const retentionGraphData = {
-//     labels: ['Begin', 'End'],
-//     datasets: [
-//       {
-//         data: [numEmployeesBegin, numEmployeesEnd], 
-//         strokeWidth: 2,  
-//       },
-//     ],
-//   };
-
-//   const turnoverGraphData = {
-//     labels: ['Left', 'Stayed'], 
-//     datasets: [
-//       {
-//         data: [numEmployeesLeft, numEmployeesStayed],  
-//         strokeWidth: 2,  
-//       },
-//     ],
-//   };
-
-//   return (
-//     <ScrollView style={styles.container}>
-//       {/* Retention Rate Section */}
-//       <View style={styles.section}>
-//         <Text style={styles.title}>Retention Rate</Text>
-//         <LineChart
-//           data={retentionGraphData}
-//           width={Dimensions.get('window').width - 40}
-//           height={220}
-//           yAxisSuffix="%"
-//           chartConfig={{
-//             backgroundColor: '#ffffff',
-//             backgroundGradientFrom: '#ffffff',
-//             backgroundGradientTo: '#ffffff',
-//             decimalPlaces: 2,
-//             color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-//             labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//             style: { borderRadius: 16 },
-//           }}
-//         />
-//         <Text style={styles.rateText}>Retention Rate: {calcRetentionRate().toFixed(2)}%</Text>
-  
-//         {/* Admin Edit Section for Retention */}
-//         <View style={styles.editContainer}>
-//           <Text style={styles.editLabel}>Number of Employees at Beginning of Period:</Text>
-//           <TextInput
-//             style={styles.input}
-//             value={numEmployeesBegin.toString()}
-//             onChangeText={(text) => setNumEmployeesBegin(parseInt(text))}
-//             keyboardType="numeric"
-//           />
-//           <Text style={styles.editLabel}>Number of Employees at End of Period:</Text>
-
-//           <TextInput
-//             style={styles.input}
-//             value={numEmployeesEnd.toString()}
-//             onChangeText={(text) => setNumEmployeesEnd(parseInt(text))}
-//             keyboardType="numeric"
-//           />
-//           <Text style={styles.editLabel}>Number of Employees Left:</Text>
-          
-//           <TextInput
-//             style={styles.input}
-//             value={numEmployeesLeft.toString()}
-//             onChangeText={(text) => setNumEmployeesLeft(parseInt(text))}
-//             keyboardType="numeric"
-//           />
-//         </View>
-//       </View>
-
-//       {/* Turnover Rate Section */}
-//       <View style={styles.section}>
-//         <Text style={styles.title}>Turnover Rate</Text>
-//         <LineChart
-//           data={turnoverGraphData}
-//           width={Dimensions.get('window').width - 40}
-//           height={220}
-//           yAxisSuffix="%"
-//           chartConfig={{
-//             backgroundColor: '#ffffff',
-//             backgroundGradientFrom: '#ffffff',
-//             backgroundGradientTo: '#ffffff',
-//             decimalPlaces: 2,
-//             color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
-//             labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-//             style: { borderRadius: 16 },
-//           }}
-//         />
-//         <Text style={styles.rateText}>Turnover Rate: {calcTurnoverRate().toFixed(2)}%</Text>
-        
-//         {/* Admin Edit Section for Turnover */}
-//         <View style={styles.editContainer}>
-//           <Text style={styles.editLabel}>Number of Employees Left:</Text>
-//           <TextInput
-//             style={styles.input}
-//             value={numEmployeesLeft.toString()}
-//             onChangeText={(text) => setNumEmployeesLeft(parseInt(text))}
-//             keyboardType="numeric"
-//           />
-//         </View>
-//       </View>
-//     </ScrollView>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     padding: 20,
-//     backgroundColor: '#4682b4',
-//   },
-
-//   section: {
-//     marginBottom: 30,
-//     alignItems: 'center',
-//     borderWidth: 1,
-//     borderColor: '#ccc',
-//     borderRadius: 8,
-//     padding: 20,
-//   },
-
-//   title: {
-//     fontSize: 20,
-//     fontWeight: 'bold',
-//     marginBottom: 10,
-//   },
-
-//   rateText: {
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//     marginTop: 10,
-//   },
-
-//   editContainer: {
-//     width: '100%',
-//     marginTop: 20,
-//     paddingHorizontal: 20,
-//   },
-
-//   editLabel: {
-//     fontSize: 16,
-//     marginBottom: 8,
-//   },
-
-//   input: {
-//     borderColor: '#ccc',
-//     borderWidth: 1,
-//     borderRadius: 8,
-//     padding: 10,
-//     marginBottom: 15,
-//     width: '100%',
-//   },
-// });
-
-// export default kpiScreen;
+export default app;

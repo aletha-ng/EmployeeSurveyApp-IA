@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Alert} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Alert } from 'react-native';
 
 const app = () => {
     const [agreement, setAgreement] = useState(false);
@@ -19,7 +19,7 @@ const app = () => {
     }, []);
 
     const submitSurvey = async () => {
-        if(!agreement || satRating == null || responseType == null || response.trim() === ''){
+        if (!agreement || satRating == null || responseType == null || response.trim() === '') {
             Alert.alert("Please answer all required fields before submitting.");
             return;
         }
@@ -32,32 +32,35 @@ const app = () => {
             submittedDate: new Date().toISOString().split('T')[0],
         };
 
-        try{
-            await axios.post('http://localhost:5001/submitSurvey', userResponse);
-            Alert.alert("Survey submitted successfully");
+        axios
+            .post('http://localhost:5001/submitSurvey', userResponse)
+            .then(() => {
+                Alert.alert('Survey submitted successfully');
 
-            //Clear survey form
-            setAgreement(false);
-            setSatRating(null);
-            setresponse('');
-            setresponseType(null);
-
-        }catch (error){
-            console.error(error);
-            Alert.alert("Unable to submit survey, there was an error. Please try again.");
-        }
-    };
-
-    const deleteSurvey = async ()=> {
-        Alert.alert('Do you want to delete all responses?', 'Delete all responnses?',
-            [{text: 'cancel', style: 'cancel',},
-            {text: 'confirm',
-            onPress: () => {
+                // Clear survey form
                 setAgreement(false);
                 setSatRating(null);
                 setresponse('');
                 setresponseType(null);
-            }}
+            })
+            .catch((error) => {
+                console.error(error);
+                Alert.alert('Unable to submit survey, there was an error. Please try again.');
+            });
+    };
+
+    const deleteSurvey = async () => {
+        Alert.alert('Do you want to delete all responses?', 'Delete all responnses?',
+            [{ text: 'cancel', style: 'cancel', },
+            {
+                text: 'confirm',
+                onPress: () => {
+                    setAgreement(false);
+                    setSatRating(null);
+                    setresponse('');
+                    setresponseType(null);
+                }
+            }
             ],
         );
     };
@@ -86,9 +89,9 @@ const app = () => {
                 <Text>On a scale of 1-5, how satisfied are you working in this company?</Text>
                 <View style={styles.satisfactionChoice}>
                     {[1, 2, 3, 4, 5].map((rating) => (
-                        <TouchableOpacity key={rating} 
-                        style={[styles.satRatingButton, rating === satRating && styles.selectedButton]} 
-                        onPress={() => setSatRating(rating)}>
+                        <TouchableOpacity key={rating}
+                            style={[styles.satRatingButton, rating === satRating && styles.selectedButton]}
+                            onPress={() => setSatRating(rating)}>
                             <Text>{rating}</Text>
                         </TouchableOpacity>
                     ))}
@@ -121,7 +124,7 @@ const app = () => {
                 />
             </View>
 
-            <View style={{flexDirection:'row', justifyContent: 'space-between'}}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                 {/*Submit*/}
                 <TouchableOpacity style={styles.submitButton} onPress={submitSurvey}>
                     <Text style={styles.submitDelBtnText}>Submit Survey</Text>
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
     componentContainer: {
         borderWidth: 1,
         borderRadius: 5,
-        width: width*0.9,
+        width: width * 0.9,
         margin: 10,
         alignItems: 'center',
         padding: 15,
@@ -196,7 +199,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
 
-    typeSelection:{
+    typeSelection: {
         flexDirection: 'row',
     },
 

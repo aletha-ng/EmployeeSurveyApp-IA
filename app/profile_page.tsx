@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Button, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, Button, Dimensions, TouchableOpacity } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { useRouter } from 'expo-router';
 import { CommonActions } from '@react-navigation/native';
@@ -9,7 +9,6 @@ import { CommonActions } from '@react-navigation/native';
 
 const UserProfile = () => {
   const navigation = useNavigation();
-  const router = useRouter();
   const [user, setUser] = useState(null); //State to store user data
   const [loading, setLoading] = useState(true); //State to manage loading state
   const [userId, setUserId] = useState(null);
@@ -17,66 +16,56 @@ const UserProfile = () => {
   //Fetch User ID
   useEffect(() => {
     const getUserId = async () => {
-        try {
-            const storedUserId = await AsyncStorage.getItem('user_id');
-            if (storedUserId) {
-                setUserId(storedUserId); 
-            } else {
-                console.log("No user ID found");
-            }
-        } catch (error) {
-            console.error('Error retrieving user_id:', error);
+      try {
+        const storedUserId = await AsyncStorage.getItem('user_id');
+        if (storedUserId) {
+          setUserId(storedUserId);
+        } else {
+          console.log("No user ID found");
         }
+      } catch (error) {
+        console.error('Error retrieving user_id:', error);
+      }
     };
 
-    getUserId(); 
+    getUserId();
   }, []);
 
   //Fetch user data 
-  //MIGHT NEED CHANGE TO . FORM
   useEffect(() => {
-    if (userId) { // Ensure userId is not null before making the request
-      const fetchUserData = async () => {
-        try {
-          console.log("Id submitted:", userId);
-          //const response = await axios.get('http://localhost:5001/api/user', userId);
-          const response = await axios.get('http://localhost:5001/api/user', {
-            params: { id: userId }
-          });
-  
-
+    //Making sure userId is not null 
+    if (userId) {
+      axios
+        .get('http://localhost:5001/api/user', { params: { id: userId } })
+        .then((response) => {
           const data = response.data;
-          setUser(data); 
-          setLoading(false); 
-
-          console.log(data);
-  
-        } catch (error) {
+          setUser(data);
+          setLoading(false);
+          console.log('Succesfully fetched data', data);
+        })
+        .catch((error) => {
           console.error('Error fetching user data:', error);
           setLoading(false);
-        }
-      };
-  
-      fetchUserData();
-    } else {
-      console.log("No user ID to fetch data");
-      setLoading(false); // Stop loading if no userId
+        });
+    }
+    else {
+      setLoading(false);
     }
   }, [userId]);
-  
 
   //Logging Out
-  const handleLogout = async () => {
+  const logout = async () => {
     try {
-        await AsyncStorage.removeItem('user_id');
-        navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{name: 'index'}],
-                  })
-                );
-        console.log('User logged out');
+      await AsyncStorage.removeItem('user_id');
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'index' }],
+        })
+      );
+      console.log('User logged out');
       
+
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -100,10 +89,6 @@ const UserProfile = () => {
 
   return (
     <View style={styles.container}>
-      {/* User Profile Image */}
-      {/* <Image source={{uri: user.profileImage }} style={styles.profileImage} /> */}
-
-      {/* User Details */}
       <View style={styles.detailsContainer}>
         <Text style={styles.detailsText}>ID: {userId}</Text>
         <Text style={styles.detailsText}>Name: {user.user_name}</Text>
@@ -111,9 +96,8 @@ const UserProfile = () => {
         <Text style={styles.detailsText}>Department: {user.user_department}</Text>
       </View>
 
-      {/* Logout Button */}
       <View style={styles.logoutButtonContainer}>
-        <Button title="Logout" onPress={handleLogout} color="#ff6347" />
+        <Button title="Logout" onPress={logout} color="#ff6347" />
       </View>
     </View>
   );
@@ -124,29 +108,51 @@ const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f8ff',
+    backgroundColor: '#4682b4',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
   },
-  
-  profileImage: {
-    width: width * 0.4,
-    height: width * 0.4,
-    borderRadius: width * 0.2, 
-    marginBottom: 20,
-  },
+
   detailsContainer: {
     marginBottom: 30,
+    width: '100%',
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    backgroundColor: 'white',
+    padding: 10,
+
   },
   detailsText: {
     fontSize: 18,
     marginVertical: 5,
-    color: '#333',
+    color: 'black',
   },
   logoutButtonContainer: {
     width: width * 0.6,
-    marginTop: 20,
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: 'black',
+  },
+  submitButton: {
+    backgroundColor: 'white',
+    padding: 10,
+    width: '40%',
+    borderRadius: 5,
+    alignItems: 'center',
+    borderColor: 'black',
+    margin: 10,
+    borderWidth: 1,
+  },
+  submitButtonText: {
+    color: 'black',
+    fontSize: 16,
+  },
+  selectedBtn: {
+    backgroundColor: '#8ab1b5',
   },
 });
 
