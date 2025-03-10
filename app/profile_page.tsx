@@ -1,23 +1,30 @@
+/**
+ * Profile Page:
+ * Displays the logged in user's details and option for logging out
+*/
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, Button, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Button, Dimensions } from 'react-native';
 import { useNavigation } from 'expo-router';
-import { useRouter } from 'expo-router';
 import { CommonActions } from '@react-navigation/native';
 
 
-const UserProfile = () => {
+const app = () => {
   const navigation = useNavigation();
-  const [user, setUser] = useState(null); //State to store user data
-  const [loading, setLoading] = useState(true); //State to manage loading state
+  const [user, setUser] = useState(null); 
+  const [loading, setLoading] = useState(true); 
   const [userId, setUserId] = useState(null);
 
-  //Fetch User ID
+  /** 
+   * Fetch User ID to match for user detail
+   * Automatically runs once page is loaded
+  */ 
   useEffect(() => {
     const getUserId = async () => {
       try {
-        const storedUserId = await AsyncStorage.getItem('user_id');
+        const storedUserId = await AsyncStorage.getItem('userID');
         if (storedUserId) {
           setUserId(storedUserId);
         } else {
@@ -31,12 +38,16 @@ const UserProfile = () => {
     getUserId();
   }, []);
 
-  //Fetch user data 
+  /** 
+   * Fetch User details that match user ID
+   * Will run everytime userID changes (e.g user changes)
+  */ 
+ 
   useEffect(() => {
-    //Making sure userId is not null 
+    //Making sure userId is not null to avoid user not found
     if (userId) {
       axios
-        .get('http://localhost:5001/api/user', { params: { id: userId } })
+        .get('http://localhost:5001/user', { params: { id: userId } })
         .then((response) => {
           const data = response.data;
           setUser(data);
@@ -53,10 +64,9 @@ const UserProfile = () => {
     }
   }, [userId]);
 
-  //Logging Out
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('user_id');
+      await AsyncStorage.removeItem('userID');
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
@@ -65,7 +75,6 @@ const UserProfile = () => {
       );
       console.log('User logged out');
       
-
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -156,4 +165,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserProfile;
+export default app;

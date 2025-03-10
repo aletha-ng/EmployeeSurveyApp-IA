@@ -1,3 +1,8 @@
+/**
+ * KPI Page: 
+ * Displays the data and charts relation to company KPI
+*/
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView, Dimensions } from 'react-native';
 import axios from 'axios';
@@ -45,7 +50,7 @@ const app = () => {
     };
 
     try {
-      await axios.post('http://localhost:5001/insert-new-kpi', kpiToSend);
+      await axios.post('http://localhost:5001/kpis/new', kpiToSend);
 
       Alert.alert('KPI data saved');
       setStartEmployees('');
@@ -59,7 +64,7 @@ const app = () => {
 
   const fetchKpiData = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/get-kpi-data');
+      const response = await axios.get('http://localhost:5001/kpis/all');
       setKpiData(response.data.results);
       setLoading(false);
     } catch (error) {
@@ -67,6 +72,7 @@ const app = () => {
     }
   };
 
+  //To fetch KPI data once the page is loaded
   useEffect(() => {
     fetchKpiData();
   }, []);
@@ -91,17 +97,11 @@ const app = () => {
 
 
 
-  }, [kpiData]); //Fill new data whenever kpiData is updated
-
-  const reloadChart = async () => {
-    setLoading(true);
-    fetchKpiData();
-  };
-
+  }, [kpiData]); //Page will update whenever kpiData is updated
 
   if (loading == true) {
     return (
-      //Avoiding to load any charts with initialised values before fetching 
+      //Avoiding to load any charts with initialised values (empty values) before fetching 
       <View style={styles.container}>
         <Text>Loading...</Text>
       </View>
@@ -133,6 +133,8 @@ const app = () => {
       <View style={styles.quarterGroup}>
         <Text style={styles.subTitle}>Select Quarter</Text>
         <View style={styles.buttonGroup}>
+          
+          {/*Creates array of four pressable buttons "Q1", "Q2", "Q3", and "Q4". */}
           {['Q1', 'Q2', 'Q3', 'Q4'].map((quarter) => (
             <TouchableOpacity
               key={quarter}

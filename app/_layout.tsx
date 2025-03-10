@@ -1,3 +1,9 @@
+/**
+ * Navigation Layout
+ * Defines the stack structure using expo-router.
+ * Each screen is given a title for clearer display within app.
+*/
+
 import {Stack} from "expo-router";
 
 export default function RootLayout() {

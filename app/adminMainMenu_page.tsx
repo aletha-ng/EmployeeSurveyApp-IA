@@ -1,9 +1,15 @@
+/**
+ * Admin Main Menu Page: 
+ * Provides navigation for admins to access their pages of the app.
+*/
+
 import React from 'react';
 import { View, StyleSheet, Dimensions, Button, } from 'react-native';
 import { useNavigation } from 'expo-router';
 
 const app = () => {
   const navigation = useNavigation();
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.adminMenuButton}>
@@ -29,7 +35,7 @@ const app = () => {
     </View>
   );
 };
-export default app;
+
 
 const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
@@ -47,3 +53,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+export default app;

@@ -1,3 +1,7 @@
+/**
+ * Login Page
+*/
+
 import React, { useState } from 'react';
 import { Text, View, StyleSheet, Button, Alert, TextInput, Dimensions } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
@@ -6,10 +10,10 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const { width, height } = Dimensions.get('window');
 
-const App = () => {
+const app = () => {
   const navigation = useNavigation();
-  const [email, onChangeEmail] = useState('');
-  const [password, onChangePass] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   const login = async () => {
     try {
@@ -19,16 +23,16 @@ const App = () => {
         password: password
       });
 
+      const {userRole, userID} = response.data;
 
-      const { user_role, user_id } = response.data;
-      //Save user_id in AsyncStorage for use during user session
-      await AsyncStorage.setItem('user_id', user_id.toString());
+      //Save userID in AsyncStorage for use during user session
+      await AsyncStorage.setItem('userID', userID.toString());
 
       let route = '';
-      if (user_role == 'admin') {
+      if (userRole == 'admin') {
         route = 'adminMainMenu_page';
       }
-      else if (user_role == 'employee') {
+      else if (userRole == 'employee') {
         route = 'employeeMainMenu_page';
       }
 
@@ -46,19 +50,18 @@ const App = () => {
     }
   };
 
-
   return (
     <View style={styles.mainContainer}>
       <View style={styles.heading}>
         <Text style={styles.heading}>Login</Text>
       </View>
 
-      <View style={styles.containerBatch}>
+      <View style={styles.upperContainer}>
         <View>
           <Text style={styles.heading2}>Email</Text>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeEmail}
+            onChangeText={setEmail}
             value={email}
             autoCapitalize="none"
           />
@@ -68,7 +71,7 @@ const App = () => {
           <Text style={styles.heading2}>Password</Text>
           <TextInput
             style={styles.input}
-            onChangeText={onChangePass}
+            onChangeText={setPassword}
             value={password}
             autoCapitalize="none"
             secureTextEntry
@@ -76,7 +79,7 @@ const App = () => {
         </View>
       </View>
 
-      <View style={styles.containerBatch2}>
+      <View style={styles.lowerContainer}>
         <View style={styles.longButton}>
           <Button
             title="Log In"
@@ -90,7 +93,6 @@ const App = () => {
   );
 };
 
-export default App;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -99,12 +101,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  containerBatch: {
+  upperContainer: {
     justifyContent: 'center',
     padding: 20,
   },
 
-  containerBatch2: {
+  lowerContainer: {
     alignContent: 'center',
     alignItems: 'center',
   },
@@ -112,14 +114,12 @@ const styles = StyleSheet.create({
   heading: {
     alignItems: 'center',
     padding: 20,
-    fontFamily: 'arial',
     fontWeight: 'bold',
     fontSize: 30,
     color: 'white',
   },
 
   heading2: {
-    fontFamily: 'arial',
     fontWeight: 'bold',
     fontSize: 15,
     color: 'white',
@@ -143,3 +143,5 @@ const styles = StyleSheet.create({
     margin: 10,
   },
 });
+
+export default app;

@@ -1,3 +1,8 @@
+/**
+ * Emailing System Page: 
+ * Allows admins to create and send emails directly from app
+*/
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -10,7 +15,8 @@ const app = () => {
   const [sendDate, setSendDate] = useState(new Date());
 
   const scheduleEmail = async () => {
-    //Formating the date received to MySQL format
+    
+    //Formating the date to MySQL format for saving to database
     const dateObject = new Date(sendDate);
     const formattedDate = dateObject.toISOString().replace('T', ' ').slice(0, 19);
 
@@ -21,11 +27,11 @@ const app = () => {
     };
 
     axios
-      .post('http://localhost:5001/api/schedule-email', emailScheduleData)
+      .post('http://localhost:5001/email/schedule', emailScheduleData)
       .then((response) => {
         Alert.alert('Scheduled', 'Email Scheduled Successfully');
 
-        // Clear all text input box 
+        // Clear all text input box for new email
         setSubject('');
         setBody('');
         setSendDate(new Date());
@@ -42,11 +48,11 @@ const app = () => {
     };
 
     axios
-      .post('http://localhost:5001/send-email-now', emailNowData)
+      .post('http://localhost:5001/email/send', emailNowData)
       .then((response) => {
         Alert.alert('Sent', 'Email Sent Successfully');
 
-        // Clear all text input box 
+        // Clear all text input box for new email
         setSubject('');
         setBody('');
         setSendDate(new Date());
@@ -56,6 +62,7 @@ const app = () => {
       });
   };
 
+  //Date & Time display changes after user selects new date/time
   const ifDateChange = (event, selectedDate) => {
     setShowDatePicker(true);
     if (selectedDate) {
@@ -64,7 +71,7 @@ const app = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.mainContainer}>
       <Text style={styles.captions}>Send Emails to Employees</Text>
 
       <View style={styles.inputGroup}>
@@ -115,7 +122,7 @@ const app = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#4682b4',
@@ -144,6 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     alignItems: 'center',
   },
+  
   submitButtonText: {
     color: 'white',
     fontSize: 16,

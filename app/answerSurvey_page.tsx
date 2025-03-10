@@ -1,48 +1,59 @@
+/**
+ * Submit Survey Page: 
+ * Allows employees to view, fill in/delete their response and submit surveys.  
+ * Survey includes:
+ * - Consent form 
+ * - Satisfaction Rating multiple choice 
+ * - Open-ended question (feedback/complaints)
+*/
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, TextInput, ScrollView, StyleSheet, Dimensions, Alert } from 'react-native';
 
 const app = () => {
-    const [agreement, setAgreement] = useState(false);
-    const [satRating, setSatRating] = useState(null);
-    const [response, setresponse] = useState('');
-    const [responseType, setresponseType] = useState(null);
-    const [userId, setUserId] = useState(null);
+    const [agreementCheck, setAgreementCheck] = useState(false);
+    const [satisfactionRating, setSatisfactionRating] = useState(null);
+    const [response, setResponse] = useState('');
+    const [responseType, setResponseType] = useState(null);
+    const [userId, setUserID] = useState(null);
 
+    //Retrieving employee's ID for when survey is submitted
     useEffect(() => {
         const getUserId = async () => {
-            let retrievedID = await AsyncStorage.getItem('user_id');
-            setUserId(retrievedID);
+            let retrievedID = await AsyncStorage.getItem('userID');
+            setUserID(retrievedID);
         };
         getUserId();
     }, []);
 
     const submitSurvey = async () => {
-        if (!agreement || satRating == null || responseType == null || response.trim() === '') {
+        if (!agreementCheck || satisfactionRating == null || responseType == null || response.trim() === '') {
             Alert.alert("Please answer all required fields before submitting.");
             return;
         }
 
         const userResponse = {
             userID: userId,
-            satisfactionRating: satRating,
+            satisfactionRating: satisfactionRating,
             feedbackType: responseType,
             feedbackResponse: response,
             submittedDate: new Date().toISOString().split('T')[0],
         };
 
         axios
-            .post('http://localhost:5001/submitSurvey', userResponse)
+            .post('http://localhost:5001/surveys/submit', userResponse)
             .then(() => {
                 Alert.alert('Survey submitted successfully');
 
-                // Clear survey form
-                setAgreement(false);
-                setSatRating(null);
-                setresponse('');
-                setresponseType(null);
+                // Clear survey form for new response
+                setAgreementCheck(false);
+                setSatisfactionRating(null);
+                setResponse('');
+                setResponseType(null);
             })
+
             .catch((error) => {
                 console.error(error);
                 Alert.alert('Unable to submit survey, there was an error. Please try again.');
@@ -55,10 +66,10 @@ const app = () => {
             {
                 text: 'confirm',
                 onPress: () => {
-                    setAgreement(false);
-                    setSatRating(null);
-                    setresponse('');
-                    setresponseType(null);
+                    setAgreementCheck(false);
+                    setSatisfactionRating(null);
+                    setResponse('');
+                    setResponseType(null);
                 }
             }
             ],
@@ -67,31 +78,31 @@ const app = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            {/*Consent Form */}
-            <View style={styles.componentContainer}>
+
+            {/*Consent Form Section*/}
+            <View style={styles.surveySection}>
                 <Text style={styles.title}>Consent Disclaimer</Text>
                 <View style={styles.consentTextContainer}>
                     <Text style={styles.consentText}>
-                        By proceeding, you agree to participate in the survey under the following terms and conditions:
-                        Your responses will be used to improve our services and may be shared in anonymized reports. You
-                        can withdraw your participation at any time.
+                        By proceeding, you agree to participate in the survey under the following terms and conditions: Your responses will be used to improve our services and may be shared in anonymized reports. You can withdraw your participation at any time.
                     </Text>
                 </View>
-                <TouchableOpacity style={[styles.btn, agreement && styles.selectedBtn]}
-                    onPress={() => setAgreement(!agreement)}>
+                <TouchableOpacity style={[styles.btn, agreementCheck && styles.selectedBtn]}
+                    onPress={() => setAgreementCheck(!agreementCheck)}>
                     <Text style={styles.btnText}>I agree</Text>
                 </TouchableOpacity>
             </View>
 
-            {/*Satisfaction satRating */}
-            <View style={styles.componentContainer}>
-                <Text style={styles.title}>Satisfaction satRating</Text>
+
+            {/*Satisfaction Rating Section */}
+            <View style={styles.surveySection}>
+                <Text style={styles.title}>Satisfaction Rating</Text>
                 <Text>On a scale of 1-5, how satisfied are you working in this company?</Text>
                 <View style={styles.satisfactionChoice}>
                     {[1, 2, 3, 4, 5].map((rating) => (
                         <TouchableOpacity key={rating}
-                            style={[styles.satRatingButton, rating === satRating && styles.selectedButton]}
-                            onPress={() => setSatRating(rating)}>
+                            style={[styles.satisfactionRatingButton, rating === satisfactionRating && styles.selectedButton]}
+                            onPress={() => setSatisfactionRating(rating)}>
                             <Text>{rating}</Text>
                         </TouchableOpacity>
                     ))}
@@ -103,15 +114,15 @@ const app = () => {
                 </View>
             </View>
 
-            {/*Written Feedback */}
-            <View style={styles.componentContainer}>
+            {/*Written Feedback Section*/}
+            <View style={styles.surveySection}>
                 <Text style={styles.title}>Feedback responses</Text>
                 <View style={styles.typeSelection}>
-                    <TouchableOpacity style={[styles.btn, responseType === 'feedback' && styles.selectedBtn]} onPress={() => setresponseType('feedback')}>
+                    <TouchableOpacity style={[styles.btn, responseType === 'feedback' && styles.selectedBtn]} onPress={() => setResponseType('feedback')}>
                         <Text style={styles.btnText}>Feedback</Text>
                     </TouchableOpacity>
 
-                    <TouchableOpacity style={[styles.btn, responseType === 'Complaints' && styles.selectedBtn]} onPress={() => setresponseType('Complaints')}>
+                    <TouchableOpacity style={[styles.btn, responseType === 'Complaints' && styles.selectedBtn]} onPress={() => setResponseType('Complaints')}>
                         <Text style={styles.btnText}>Complaints</Text>
                     </TouchableOpacity>
                 </View>
@@ -120,7 +131,7 @@ const app = () => {
                     style={styles.input}
                     placeholder="Write responses here..."
                     value={response}
-                    onChangeText={setresponse}
+                    onChangeText={setResponse}
                 />
             </View>
 
@@ -135,12 +146,13 @@ const app = () => {
                     <Text style={styles.submitDelBtnText}>Delete all response</Text>
                 </TouchableOpacity>
             </View>
+
         </ScrollView>
     );
 };
 
-const { width, height } = Dimensions.get('window');
 
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -150,7 +162,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#4682b4',
     },
 
-    componentContainer: {
+    surveySection: {
         borderWidth: 1,
         borderRadius: 5,
         width: width * 0.9,
@@ -209,7 +221,7 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
 
-    satRatingButton: {
+    satisfactionRatingButton: {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'white',
@@ -270,5 +282,6 @@ const styles = StyleSheet.create({
         marginLeft: 20,
     },
 });
+
 
 export default app;

@@ -1,138 +1,38 @@
+/**
+ * Employee Main Menu Page: 
+ * Provides navigation for employee to access their pages of the app.
+*/
+
 import React from 'react';
 import { View, StyleSheet, Dimensions, Button, } from 'react-native';
 import { useNavigation } from 'expo-router';
 
-//Universal Constants
-const { width, height } = Dimensions.get('window');
-
 const app = () => {
   const navigation = useNavigation();
 
-  const handlePress = (route: string) => {
-    navigation.navigate(route);
-  };
-
-  //Layout 
   return (
     <View style={styles.mainContainer}>
-      <View style={styles.adminMenuButton}>
-        <Button
-          title='Submit A Survey'
-          color='white'
-          onPress={() => handlePress('answerSurvey_page')}
-        />
+      <View style={styles.employeeMenuButton}>
+        <Button title='Submit A Survey' color='white' onPress={() => navigation.navigate('answerSurvey_page')}/>
       </View>
 
-      <View style={styles.adminMenuButton}>
-        <Button
-          title='Profile'
-          color='white'
-          onPress={() => handlePress('profile_page')}
-        />
+      <View style={styles.employeeMenuButton}>
+        <Button title='Profile' color='white' onPress={() => navigation.navigate('profile_page')}/>
       </View>
     </View>
   );
 };
 
-export default app;
 
-
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  //Container Styles
   mainContainer: {
     flex: 1,
     alignItems: 'center',
     backgroundColor: '#4682b4',
   },
 
-  containerRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-end',
-    padding: 10,
-    borderWidth: 1,
-  },
-
-
-  //Text Styles
-  heading: {
-    alignItems: 'center',
-    padding: 10,
-    fontFamily: 'arial',
-    fontWeight: 'bold',
-    fontSize: 30,
-  },
-
-  heading2: {
-    fontFamily: 'arial',
-    fontWeight: 'bold',
-    fontSize: 15,
-  },
-
-  heading3: {
-    fontFamily: 'arial',
-    fontSize: 12,
-  },
-
-  //Component Styles
-  input: {
-    height: height * 0.05,
-    width: width * 0.8,
-    justifyContent: 'center',
-    margin: 10,
-    borderWidth: 1,
-    padding: 5,
-  },
-
-  shortButton: {
-    borderColor: 'black',
-    borderWidth: 1,
-    justifyContent: 'center',
-    width: width * 0.4,
-    height: height * 0.05,
-  },
-
-  longButton: {
-    borderColor: 'black',
-    justifyContent: 'center',
-    borderWidth: 1,
-    width: width * 0.6,
-    height: height * 0.05,
-    margin: 10,
-  },
-
-  selectedButton: {
-    backgroundColor: '#c3d4d3',
-  },
-
-  profile: {
-    width: width * 0.7,
-    height: height * 0.3,
-    margin: 10,
-  },
-
-  pressableBox: {
-    width: width * 0.9,
-    height: height * 0.1,
-    backgroundColor: 'grey',
-  },
-
-  surveyConsentTitle: {
-    width: width * 0.9,
-    height: height * 0.1,
-    margin: 10,
-    padding: 10,
-    borderWidth: 1,
-  },
-
-  surveyConsentText: {
-    width: width * 0.9,
-    margin: 10,
-    padding: 10,
-    borderWidth: 1,
-  },
-
-  adminMenuButton: {
+  employeeMenuButton: {
     margin: 10,
     padding: 10,
     borderWidth: 1,
@@ -140,3 +40,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+export default app;

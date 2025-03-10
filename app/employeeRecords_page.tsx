@@ -1,8 +1,13 @@
+/**
+ * Employee Record List Page: 
+ * Displays details of employees registered in database.
+*/
+
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 
-const EmployeeListScreen = () => {
+const app = () => {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -10,7 +15,7 @@ const EmployeeListScreen = () => {
   useEffect(() => {
     //Fetch employee list from the backend API
     axios
-      .get('http://localhost:5001/getEmpList')
+      .get('http://localhost:5001/employees')
       .then((response) => {
         setEmployees(response.data.employees);
         setLoading(false);
@@ -72,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EmployeeListScreen;
+export default app;

@@ -1,4 +1,7 @@
-///ADD STYLE SHEET
+/**
+ * Response Page: 
+ * Displays the employee's submitted responses from survey
+*/
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
@@ -14,7 +17,7 @@ const app = () => {
   //Fetch employee list from the backend API first time loaded for displaying data
   useEffect(() => {
     axios
-      .get('http://localhost:5001/api/feedbacks')
+      .get('http://localhost:5001/surveys/feedback')
       .then((response) => {
         setFeedback(response.data);
       })
@@ -25,7 +28,7 @@ const app = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5001/satisfaction-distribution')
+      .get('http://localhost:5001/surveys/satisfaction-distribution')
       .then((response) => {
         const count = response.data.map((item) => item.count);
         setRatingCounts(count);
@@ -46,14 +49,15 @@ const app = () => {
     console.log(multiplier, totalRatingResponse, sumRating);
   });
 
-  let averageSatisfaction = 0;
+  let averageSatisfaction;
   if (totalRatingResponse === 0) {
     averageSatisfaction = 0;
   }
   else {
-    averageSatisfaction = sumRating / totalRatingResponse;
+    averageSatisfaction = (sumRating / totalRatingResponse).toFixed(2);
   }
 
+  //Preparing data for bar chart
   const yAxisInterval = Math.ceil(totalRatingResponse / 5);
   const maxY = yAxisInterval * 5;
 
@@ -117,10 +121,6 @@ const app = () => {
   );
 };
 
-export default app;
-
-const { width, height } = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -143,3 +143,5 @@ const styles = StyleSheet.create({
   }
 
 });
+
+export default app;
