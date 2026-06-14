@@ -1,50 +1,21 @@
-# Welcome to your Expo app 👋
+# Employee Survey App
+A cross-platform mobile app built for a client as a part of an internall assestment project to streamline employee survey collection and real-time KPI visualization.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Summary
+Built as part of a client engagement including criteria gathering, system design, prototype design, and delivery. The app replaces manual survey distribution and reporting with an automated, centralized platform. 
 
-## Get started
+## Features
+- Admin and Employee specific page
+- Survey-making features with variety of types of questions: multiple choice, ranks, open-ended.
+- Real-time KPI dashboard and data visualization of survey results: Employee satisfaction rate, turnover rate, retention rate with comparison of past business year. 
+- Automated mass emailing and survey scheduling via Cron
+- Secure user authentication (bcrypt)
+- REST API backend with full CRUD operations
 
-1. Install dependencies
+## Tech Stack
+- **Frontend:** React Native, TypeScript
+- **Backend:** Node.js, Express.js
+- **Database:** MySQL
+- **Other:** Cron, bcrypt, nodemailer, Git, Expo
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-    npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Screenshots
