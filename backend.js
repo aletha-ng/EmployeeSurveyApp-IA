@@ -23,7 +23,8 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
 
-//Login User - Checking details inputted by users
+//Login User - Checking details inputted by userss against database and return user role and 
+// id if successful for further use in app
 app.post("/login", (req, res) => {
   const {email, password} = req.body;
 
